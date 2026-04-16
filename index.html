@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNS運用 ボールトラッカー</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:#1a1a2e;font-size:13px}
+.page{padding:16px 20px}
+h1{font-size:18px;font-weight:700;margin-bottom:2px}
+.sub{font-size:12px;color:#888;margin-bottom:12px}
+.toolbar{display:flex;gap:16px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.legend{display:flex;gap:14px;font-size:12px;align-items:center;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;margin-right:3px}
+.zctrl{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px}
+.zctrl button{border:1px solid #ccc;background:#fff;border-radius:4px;padding:3px 10px;cursor:pointer;font-weight:700;color:#555}
+.zctrl button:hover{background:#eee}
+.zlabel{min-width:52px;text-align:center;font-weight:600;color:#555}
+
+/* === CHART === */
+.chart-wrap{border:1px solid #ddd;border-radius:8px;background:#fff;overflow:hidden}
+.chart-scroll{overflow-x:auto;overflow-y:visible;position:relative}
+table.gantt{border-collapse:collapse;table-layout:fixed}
+table.gantt th,table.gantt td{padding:0;border:none;vertical-align:middle}
+
+/* Left cols */
+.col-name{width:220px;min-width:220px;position:sticky;left:0;z-index:6;background:#fff;border-right:1px solid #e0e0e0;padding:6px 10px !important;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-who{width:64px;min-width:64px;position:sticky;left:220px;z-index:6;background:#fff;border-right:1px solid #e0e0e0;text-align:center;padding:4px 2px !important}
+thead .col-name,thead .col-who{background:#f7f7f7;z-index:8;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+tbody tr:hover .col-name,tbody tr:hover .col-who{background:#f3f6ff}
+
+.ptag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;display:inline-block}
+.pt-中谷{background:#dbeafe;color:#1d4ed8}
+.pt-三上{background:#dcfce7;color:#15803d}
+.pt-新山{background:#fef9c3;color:#a16207}
+.pt-浅井{background:#f3e8ff;color:#7c3aed}
+.pt-中谷→三上{background:#dbeafe;color:#1d4ed8}
+
+.status{font-size:13px;float:right}
+
+/* Timeline cell */
+.tl-cell{height:32px;position:relative;border-left:1px solid #f0f0f0;padding:0 !important}
+thead .tl-cell{height:28px;border-left:1px solid #ddd;font-size:10px;color:#999;text-align:center;line-height:28px;font-weight:600;overflow:hidden}
+thead .tl-cell.day-start{border-left:2px solid #bbb;color:#555;font-size:11px;font-weight:700}
+
+/* Category row */
+.cat-row td{background:#f0f0f5;padding:4px 10px !important;font-size:11px;font-weight:700;color:#6366f1}
+
+/* Bar */
+.bar{position:absolute;height:18px;top:50%;transform:translateY(-50%);border-radius:3px;z-index:2;cursor:pointer;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bar:hover{filter:brightness(1.12);z-index:10}
+.bar.team{background:#4285f4}
+.bar.client{background:#ea4335}
+.bar span{font-size:8px;color:rgba(255,255,255,.92);font-weight:700;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* End dot */
+.edot{position:absolute;top:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;background:#34a853;border:2px solid #fff;box-shadow:0 0 0 1px #34a853;z-index:3}
+
+/* Update line */
+.uline{position:absolute;top:0;bottom:0;width:2px;background:#fbbc04;z-index:4;pointer-events:none}
+
+/* Tooltip */
+#tip{display:none;position:fixed;background:#1e293b;color:#fff;padding:8px 12px;border-radius:6px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+
+/* Summary */
+.cards{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.card{flex:1;min-width:130px;padding:12px 14px;border-radius:8px;border:1px solid #e0e0e0;background:#fff}
+.card b{font-size:24px;display:block}
+.card small{font-size:11px;color:#666}
+.c-green b{color:#34a853} .c-red b{color:#ea4335} .c-blue b{color:#4285f4}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>SNS運用 ボールトラッカー</h1>
+<div class="sub"><span id="dateRange"></span> | Slack + LINE | ホイールで拡大・縮小 | 最終更新: <b id="ts" style="color:#e8a000">--</b></div>
+<div class="toolbar">
+<div class="legend">
+<span><i style="background:#4285f4"></i>こちらボール</span>
+<span><i style="background:#ea4335"></i>根本さんボール</span>
+<span><i style="background:#34a853;border-radius:50%"></i>完了</span>
+<span><i style="background:#fbbc04"></i>最終更新</span>
+</div>
+<div class="zctrl">
+<button id="zo">−</button><div class="zlabel" id="zl">フィット</div><button id="zi">＋</button>
+<button id="zf" style="font-size:11px;font-weight:500">リセット</button>
+</div>
+</div>
+<div class="chart-wrap"><div class="chart-scroll" id="sc"><table class="gantt" id="gt"></table></div></div>
+<div class="cards" id="cards"></div>
+</div>
+<div id="tip"></div>
+<script>
+// 今日から30日前を起点（翌日になれば自動で範囲がスライド）
+const NOW_DATE=new Date();NOW_DATE.setHours(0,0,0,0);
+const SD=new Date(NOW_DATE);SD.setDate(SD.getDate()-30);
+const TD=31,W=['日','月','火','水','木','金','土'];
+const DAYS=[];for(let i=0;i<TD;i++){const d=new Date(SD);d.setDate(d.getDate()+i);DAYS.push({l:`${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]})`,d});}
+const UPD='2026-04-15 22:40';
+function T(mo,dy,h=0,m=0){const t=new Date(2026,mo-1,dy);return(t-SD)/864e5+(h+m/60)/24;}
+
+const D=[
+{cat:'3月前半',tasks:[
+{n:'地元回り投稿',p:'浅井',dn:true,sg:[
+{s:T(3,16,15,12),e:T(3,16,16,25),t:'client',p:'根本',tp:'根本が投稿作成依頼'},
+{s:T(3,16,16,25),e:T(3,16,21,29),t:'team',p:'新山',tp:'新山が投稿案提出'},
+{s:T(3,16,21,29),e:T(3,18,15,28),t:'client',p:'根本',tp:'根本が文章修正→写真依頼'},
+{s:T(3,18,15,28),e:T(3,18,19,46),t:'team',p:'浅井',tp:'浅井が17時投稿予定'},
+{s:T(3,18,19,46),e:T(3,19,13,25),t:'client',p:'根本',tp:'根本が確認遅れ→催促'},
+{s:T(3,19,13,25),e:T(3,19,14),t:'team',p:'浅井',tp:'浅井が投稿実行'},
+],en:T(3,19,14)},
+{n:'拓メシ 立ち食い蕎麦',p:'新山',dn:true,sg:[
+{s:T(3,16,15,16),e:T(3,16,16,42),t:'client',p:'根本',tp:'根本が投稿提案'},
+{s:T(3,16,16,42),e:T(3,16,16,49),t:'team',p:'新山',tp:'新山が投稿案作成'},
+{s:T(3,16,16,49),e:T(3,16,18,34),t:'client',p:'根本',tp:'根本がシンプル文章提案'},
+{s:T(3,16,18,34),e:T(3,16,19),t:'team',p:'新山',tp:'新山がストーリー投稿'},
+],en:T(3,16,19)},
+{n:'ガソリン速報',p:'新山',dn:true,sg:[
+{s:T(3,17,13,3),e:T(3,17,14,41),t:'client',p:'根本',tp:'根本が今日中に投稿依頼'},
+{s:T(3,17,14,41),e:T(3,17,15,3),t:'team',p:'新山',tp:'新山が文言修正提案'},
+{s:T(3,17,15,3),e:T(3,17,15,59),t:'client',p:'根本',tp:'根本が承認'},
+{s:T(3,17,15,59),e:T(3,17,18),t:'team',p:'新山',tp:'新山が18時予約投稿'},
+],en:T(3,17,18)},
+{n:'LINE用動画(3月)',p:'中谷',dn:true,sg:[
+{s:T(3,17,22,2),e:T(3,18,16,7),t:'client',p:'根本',tp:'根本が編集依頼'},
+{s:T(3,18,16,7),e:T(3,18,21,45),t:'team',p:'中谷',tp:'中谷が編集済み動画提出'},
+{s:T(3,18,21,45),e:T(3,19,18,17),t:'client',p:'根本',tp:'根本「とても良い」承認→メッセージ修正'},
+{s:T(3,19,18,17),e:T(3,20,14),t:'team',p:'中谷',tp:'中谷が14時にLINE投稿'},
+],en:T(3,20,14)},
+]},
+{cat:'3月後半',tasks:[
+{n:'しゅふコミイベント登壇',p:'中谷',dn:true,sg:[
+{s:T(3,19,14,27),e:T(3,19,18,51),t:'client',p:'根本',tp:'根本が投稿案作成依頼'},
+{s:T(3,19,18,51),e:T(3,19,19,31),t:'team',p:'中谷',tp:'中谷が投稿文案提出'},
+{s:T(3,19,19,31),e:T(3,19,23,52),t:'client',p:'根本',tp:'根本が修正+名前修正指示'},
+{s:T(3,19,23,52),e:T(3,20,12),t:'team',p:'中谷',tp:'中谷が投稿'},
+],en:T(3,20,12)},
+{n:'日米首脳会談',p:'中谷',dn:true,sg:[
+{s:T(3,20,19,6),e:T(3,20,19,30),t:'client',p:'根本',tp:'根本が速報投稿を依頼(文案付き)'},
+{s:T(3,20,19,30),e:T(3,20,21),t:'team',p:'中谷',tp:'中谷が誤字チェック+写真提案→投稿'},
+],en:T(3,20,21)},
+{n:'ひょっとこロゲイニング',p:'新山',dn:true,sg:[
+{s:T(3,22,17,32),e:T(3,22,19,30),t:'client',p:'根本',tp:'根本が投稿作成依頼'},
+{s:T(3,22,19,30),e:T(3,23,16,2),t:'team',p:'新山',tp:'新山が投稿案+写真提出'},
+{s:T(3,23,16,2),e:T(3,23,17,28),t:'client',p:'根本',tp:'根本が修正文+写真7枚送付'},
+{s:T(3,23,17,28),e:T(3,23,19),t:'team',p:'新山',tp:'新山が19時予約投稿'},
+],en:T(3,23,19)},
+{n:'決済・イノベーション推進PT',p:'中谷',dn:true,sg:[
+{s:T(3,25,9,58),e:T(3,25,16,37),t:'client',p:'根本',tp:'根本が投稿案依頼'},
+{s:T(3,25,16,37),e:T(3,25,16,55),t:'team',p:'中谷',tp:'中谷が投稿文提出'},
+{s:T(3,25,16,55),e:T(3,25,17,57),t:'client',p:'根本',tp:'根本が修正→投稿依頼'},
+{s:T(3,25,17,57),e:T(3,26,10),t:'team',p:'中谷',tp:'中谷が投稿作業'},
+],en:T(3,26,10)},
+{n:'お弁当つくり(キャラ弁)',p:'新山',dn:true,sg:[
+{s:T(3,25,12,31),e:T(3,25,16,59),t:'client',p:'根本',tp:'根本が投稿案依頼'},
+{s:T(3,25,16,59),e:T(3,25,17,28),t:'team',p:'新山',tp:'新山がキャラ弁投稿案提出'},
+{s:T(3,25,17,28),e:T(3,25,22,38),t:'client',p:'根本',tp:'根本が文章微修正'},
+{s:T(3,25,22,38),e:T(3,27,18),t:'team',p:'新山',tp:'新山が3/27 18時予約投稿'},
+],en:T(3,27,18)},
+{n:'商工会議所リポスト',p:'浅井',dn:true,sg:[
+{s:T(3,25,13,25),e:T(3,26,10,5),t:'client',p:'根本',tp:'根本がリポスト依頼(今日中)'},
+{s:T(3,26,10,5),e:T(3,26,12,50),t:'team',p:'浅井',tp:'浅井がリポスト文案提出'},
+{s:T(3,26,12,50),e:T(3,26,16),t:'client',p:'根本',tp:'根本が修正文送付'},
+{s:T(3,26,16),e:T(3,26,16,30),t:'team',p:'浅井',tp:'浅井がX投稿'},
+],en:T(3,26,16,30)},
+{n:'卒業式まとめ投稿',p:'三上',dn:true,sg:[
+{s:T(3,29,17,18),e:T(3,30,8,4),t:'client',p:'根本',tp:'根本が卒業式投稿を提案'},
+{s:T(3,30,8,4),e:T(3,30,11,32),t:'team',p:'新山',tp:'新山が投稿案提出'},
+{s:T(3,30,11,32),e:T(3,31,8,4),t:'client',p:'根本',tp:'根本が写真承認(見落とし遅延)'},
+{s:T(3,31,8,4),e:T(3,31,18),t:'team',p:'三上',tp:'三上が投稿作業'},
+],en:T(3,31,18)},
+{n:'船引バイパス動画',p:'新山',dn:true,sg:[
+{s:T(3,29,19,58),e:T(3,29,20,34),t:'team',p:'新山',tp:'新山が動画+投稿文提出'},
+{s:T(3,29,20,34),e:T(3,29,20,50),t:'client',p:'根本',tp:'根本が承認→写真差込追加依頼'},
+{s:T(3,29,20,50),e:T(3,29,22,10),t:'team',p:'新山',tp:'新山が写真差込+BGM付き修正'},
+{s:T(3,29,22,10),e:T(3,30,11,26),t:'client',p:'根本',tp:'根本「とてもよい」承認'},
+{s:T(3,30,11,26),e:T(3,30,18),t:'team',p:'新山',tp:'新山が18時投稿'},
+],en:T(3,30,18)},
+]},
+{cat:'4月第1週(3/31-4/6)',tasks:[
+{n:'ガソリン価格(Q&A)',p:'中谷',dn:true,sg:[
+{s:T(3,31,16,50),e:T(4,1,17,59),t:'client',p:'根本',tp:'根本が文案提示→考え直す'},
+{s:T(4,1,17,59),e:T(4,1,21,36),t:'team',p:'中谷',tp:'中谷が読みやすさ改善版提出'},
+{s:T(4,1,21,36),e:T(4,1,23,18),t:'client',p:'根本',tp:'根本が短縮版承認'},
+{s:T(4,1,23,18),e:T(4,2,10),t:'team',p:'中谷',tp:'中谷が4/2 10時投稿'},
+],en:T(4,2,10)},
+{n:'IGコメント返信(8件)',p:'新山',dn:true,sg:[
+{s:T(3,31,17,24),e:T(3,31,17,24),t:'team',p:'新山',tp:'新山がコメント返信を提案'},
+{s:T(3,31,17,24),e:T(3,31,17,43),t:'team',p:'新山',tp:'新山が返信例を提出'},
+{s:T(3,31,17,43),e:T(3,31,17,52),t:'client',p:'根本',tp:'根本が一部修正'},
+{s:T(3,31,17,52),e:T(3,31,19,14),t:'team',p:'新山',tp:'新山がコメント返信実行'},
+],en:T(3,31,19,14)},
+{n:'幸楽苑リニューアル（却下）',p:'新山',dn:true,sg:[
+{s:T(4,2,14,43),e:T(4,2,23,22),t:'team',p:'新山',tp:'新山が投稿提案(チーム起点)'},
+{s:T(4,2,23,22),e:T(4,3,9,36),t:'client',p:'根本',tp:'根本「実際に足を運んでから」→却下'},
+],en:T(4,3,9,36)},
+{n:'しゅふコミ動画(ストーリー3分割)',p:'三上',dn:true,sg:[
+{s:T(4,2,16,1),e:T(4,2,23,17),t:'team',p:'三上',tp:'三上が動画作成・提出(チーム起点)'},
+{s:T(4,2,23,17),e:T(4,3,10,7),t:'client',p:'根本',tp:'根本「導入不足」→不採用→ストーリー3分割に方針転換'},
+{s:T(4,3,10,7),e:T(4,3,17,20),t:'team',p:'三上',tp:'三上が3本編集完了'},
+{s:T(4,3,17,20),e:T(4,4,23,4),t:'client',p:'根本',tp:'根本がタイトル修正依頼→承認'},
+{s:T(4,4,23,4),e:T(4,4,23,24),t:'team',p:'三上',tp:'三上がストーリー投稿'},
+],en:T(4,4,23,24)},
+{n:'コーヒー自販機',p:'中谷',dn:true,sg:[
+{s:T(4,3,10,16),e:T(4,3,13,23),t:'client',p:'根本',tp:'根本が投稿案依頼'},
+{s:T(4,3,13,23),e:T(4,3,13,41),t:'team',p:'中谷',tp:'中谷が投稿文+写真提出'},
+{s:T(4,3,13,41),e:T(4,3,15,48),t:'client',p:'根本',tp:'根本「素晴らしい」承認'},
+{s:T(4,3,15,48),e:T(4,3,18),t:'team',p:'中谷',tp:'中谷が18時予約投稿'},
+],en:T(4,3,18)},
+{n:'ねぎし拓メシ(ストーリー)',p:'中谷',dn:true,sg:[
+{s:T(4,5,11,23),e:T(4,5,14,21),t:'team',p:'中谷',tp:'中谷がストーリー投稿を提案(チーム起点)'},
+{s:T(4,5,14,21),e:T(4,5,22,12),t:'client',p:'根本',tp:'根本が店情報送付'},
+{s:T(4,5,22,12),e:T(4,6,6,49),t:'team',p:'中谷',tp:'中谷がキャプション+画像提出'},
+{s:T(4,6,6,49),e:T(4,6,11,52),t:'client',p:'根本',tp:'根本が地名・料理名修正'},
+{s:T(4,6,11,52),e:T(4,6,12),t:'team',p:'中谷',tp:'中谷がストーリー投稿'},
+],en:T(4,6,12)},
+]},
+{cat:'4月第2週(4/7-4/14)',tasks:[
+{n:'小泉大臣 引用リポスト',p:'中谷',dn:true,sg:[
+{s:T(4,7,7,30),e:T(4,7,7,59),t:'team',p:'中谷',tp:'中谷がリポスト提案'},
+{s:T(4,7,7,59),e:T(4,7,10,58),t:'client',p:'根本',tp:'根本が返信文案提示'},
+{s:T(4,7,10,58),e:T(4,7,11,3),t:'team',p:'中谷',tp:'中谷がリポスト実行'},
+],en:T(4,7,11,3)},
+{n:'郡山クマ出没 注意喚起',p:'三上',dn:true,sg:[
+{s:T(4,8,10,16),e:T(4,8,11,47),t:'team',p:'三上',tp:'三上がニュース記事から提案'},
+{s:T(4,8,11,47),e:T(4,8,12,32),t:'client',p:'根本',tp:'根本が公式発表ベースに修正'},
+{s:T(4,8,12,32),e:T(4,8,12,47),t:'team',p:'三上',tp:'三上が投稿'},
+],en:T(4,8,12,47)},
+{n:'天皇皇后両陛下 愛子さま訪問',p:'三上',dn:true,sg:[
+{s:T(4,8,10,29),e:T(4,8,11,58),t:'team',p:'三上',tp:'三上が福島民報記事から提案'},
+{s:T(4,8,11,58),e:T(4,8,12,30),t:'client',p:'根本',tp:'根本が修正+引用リポスト形式指示'},
+{s:T(4,8,12,30),e:T(4,8,13,54),t:'team',p:'三上',tp:'三上がクマ投稿60分後に投稿'},
+],en:T(4,8,13,54)},
+{n:'ねもトーク告知(SNS)',p:'新山',dn:true,sg:[
+{s:T(4,8,9,55),e:T(4,8,11,19),t:'team',p:'三上→新山',tp:'伊藤依頼→三上告知文→新山提案'},
+{s:T(4,8,11,19),e:T(4,8,11,47),t:'client',p:'根本',tp:'根本が文章修正'},
+{s:T(4,8,11,47),e:T(4,9,22,20),t:'team',p:'新山',tp:'新山が投稿準備・実行'},
+],en:T(4,9,22,20)},
+{n:'FSG入学式 お祝い動画',p:'新山',dn:true,sg:[
+{s:T(4,8,12,0),e:T(4,8,12,20),t:'client',p:'根本',tp:'根本が動画素材共有+制作依頼'},
+{s:T(4,8,12,20),e:T(4,8,20,15),t:'team',p:'新山',tp:'新山が仮案制作(3分22秒)'},
+{s:T(4,8,20,15),e:T(4,9,7,32),t:'client',p:'根本',tp:'根本「もう少し短く」→「さらに削りたい」'},
+{s:T(4,9,7,32),e:T(4,9,22,14),t:'team',p:'新山',tp:'新山が修正+タイトル・ハッシュタグ提案'},
+{s:T(4,9,22,14),e:T(4,9,22,18),t:'client',p:'根本',tp:'根本「良いと思います！」承認'},
+{s:T(4,9,22,18),e:T(4,10,19,17),t:'team',p:'新山',tp:'新山が4媒体投稿'},
+],en:T(4,10,19,17)},
+{n:'原油価格への期待と不安',p:'三上',dn:true,sg:[
+{s:T(4,9,11,24),e:T(4,9,12),t:'team',p:'三上',tp:'三上が福島民友記事から提案'},
+{s:T(4,9,12),e:T(4,13,21,47),t:'client',p:'根本',tp:'根本 未返信(約4日)'},
+{s:T(4,13,21,47),e:T(4,14,12,7),t:'team',p:'三上',tp:'根本FB後→三上が改訂案提出'},
+{s:T(4,14,12,7),e:T(4,14,15,54),t:'client',p:'根本',tp:'根本が投稿文修正+ネモトーク起点のトーンに変更'},
+{s:T(4,14,15,54),e:T(4,14,21,53),t:'team',p:'三上',tp:'三上が写真選定+画像調整'},
+{s:T(4,14,21,53),e:T(4,15,9,42),t:'client',p:'根本',tp:'根本「セーフティネット資料なし、支援機関一覧は付加価値高い」'},
+{s:T(4,15,9,42),e:T(4,15,9,48),t:'team',p:'三上',tp:'三上が調整了承'},
+{s:T(4,15,9,48),e:T(4,15,11,17),t:'client',p:'根本',tp:'根本が最終投稿文提示→三上が画像調整提出'},
+{s:T(4,15,11,17),e:T(4,15,11,25),t:'client',p:'根本',tp:'根本「素晴らしい！！投稿をお願い！」Xでも画像使用を指示'},
+{s:T(4,15,11,25),e:T(4,15,11,41),t:'team',p:'三上',tp:'三上がX/IG/FB 3媒体に投稿'},
+],en:T(4,15,11,41)},
+{n:'4月LINE配信用動画',p:'中谷→三上',dn:true,sg:[
+{s:T(4,12,16,38),e:T(4,12,17),t:'client',p:'根本',tp:'根本がGドライブ素材アップ(LINE)'},
+{s:T(4,12,17),e:T(4,13,9,29),t:'team',p:'中谷',tp:'中谷が編集作業'},
+{s:T(4,13,9,29),e:T(4,13,11,10),t:'client',p:'根本',tp:'根本が漢字修正指示'},
+{s:T(4,13,11,10),e:T(4,13,17,8),t:'team',p:'中谷',tp:'中谷が修正動画+メッセージ文提出'},
+{s:T(4,13,17,8),e:T(4,13,21,44),t:'client',p:'根本',tp:'根本がメッセージ文作成'},
+{s:T(4,13,21,44),e:T(4,14,12,14),t:'team',p:'三上',tp:'中谷承認→三上が12時LINE配信'},
+],en:T(4,14,12,14)},
+{n:'お花見ショート動画(昼桜+夜桜)',p:'新山',dn:false,sg:[
+{s:T(4,11,22,57),e:T(4,11,23,14),t:'client',p:'伊藤',tp:'伊藤が素材12本共有+制作依頼'},
+{s:T(4,11,23,14),e:T(4,13,11,25),t:'team',p:'新山',tp:'新山が冒頭動画制作(LINE)'},
+{s:T(4,13,11,25),e:T(4,13,14,21),t:'client',p:'根本',tp:'新山が構成案提示→根本確認'},
+{s:T(4,13,14,21),e:T(4,15,22,40),t:'team',p:'新山',tp:'根本承認済み。新山が本編制作中'},
+]},
+{n:'お花見 写真投稿',p:'中谷',dn:true,sg:[
+{s:T(4,13,0,41),e:T(4,13,10,20),t:'team',p:'中谷',tp:'中谷がLINE提案→Slack投稿案作成'},
+{s:T(4,13,10,20),e:T(4,13,21,39),t:'client',p:'根本',tp:'根本 確認待ち(見落とし)'},
+{s:T(4,13,21,39),e:T(4,14,10,27),t:'team',p:'中谷',tp:'根本修正→中谷がX用4枚選定'},
+{s:T(4,14,10,27),e:T(4,14,10,43),t:'client',p:'根本',tp:'根本「ご提案どおりで」承認'},
+{s:T(4,14,10,43),e:T(4,14,11,58),t:'team',p:'中谷',tp:'中谷が投稿'},
+],en:T(4,14,11,58)},
+{n:'修学旅行生との動画',p:'中谷',dn:false,sg:[
+{s:T(4,15,11,31),e:T(4,15,22,40),t:'client',p:'根本',tp:'根本確認待ち→青木「素晴らしい」17:25→根本「素晴らしい！」+動画修正指示5点(18:00)'},
+{s:T(4,15,18,0),e:T(4,15,21,15),t:'team',p:'中谷',tp:'中谷が動画修正作業(パート入替・テロップ拡大・感情表現・尺短縮)'},
+{s:T(4,15,21,15),e:T(4,15,22,40),t:'client',p:'根本',tp:'中谷が修正版提出→根本「(笑)入れて」'},
+{s:T(4,15,21,31),e:T(4,15,21,39),t:'team',p:'中谷',tp:'中谷が(笑)入り修正版+キャプション再提出'},
+{s:T(4,15,21,39),e:T(4,15,21,42),t:'client',p:'根本',tp:'根本「素晴らしい！」最終承認'},
+{s:T(4,15,21,42),e:T(4,15,22,4),t:'team',p:'中谷',tp:'中谷がYouTube含む4媒体投稿を提案→根本承認。明日19時予約投稿予定'},
+]},
+{n:'自民党ガバナンス委員会',p:'未定',dn:false,sg:[
+{s:T(4,15,22,22),e:T(4,15,22,40),t:'client',p:'根本',tp:'根本が投稿依頼(写真3/26-27)。「対応します」リアクション付き'},
+]},
+{n:'ベンチマーク巡回リスト',p:'三上',dn:false,sg:[
+{s:T(4,10,11,0),e:T(4,10,11,34),t:'team',p:'三上',tp:'三上がリスト更新・提出(LINE)'},
+{s:T(4,10,11,34),e:T(4,12,12,20),t:'client',p:'根本',tp:'根本「絞った方がいい」(LINE)'},
+{s:T(4,12,12,20),e:T(4,12,16,34),t:'team',p:'三上',tp:'三上「109件/30分」回答(LINE)'},
+{s:T(4,12,16,34),e:T(4,15,22,40),t:'client',p:'根本',tp:'根本「私の方で優先順位を考えます」(3日経過)'},
+]},
+]},
+];
+
+// ====== RENDER ======
+let zoom=1;const sc=document.getElementById('sc'),gt=document.getElementById('gt');
+function tlW(){const a=sc.clientWidth-284;return zoom<=1?Math.max(a,500):a*zoom;}
+
+function upT(){
+  const m=UPD.match(/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+)/);
+  if(!m)return null;
+  return T(+m[2],+m[3],+m[4],+m[5]);
+}
+
+function render(){
+const w=tlW(),ppd=w/TD,ut=upT();
+let h='';
+
+// ALL rows: 3 cells only (col-name | col-who | single wide timeline cell)
+
+// Header
+h+='<thead><tr><th class="col-name">タスク名</th><th class="col-who">担当</th>';
+h+=`<th class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px;height:28px">`;
+// Day labels as absolute-positioned divs inside single header cell
+for(let d=0;d<TD;d++){
+  const x=d*ppd;
+  const isToday=DAYS[d].d.getTime()===NOW_DATE.getTime();
+  const dayStyle=isToday?'border-left:2px solid #1a73e8;padding-left:4px;font-size:11px;font-weight:700;color:#1a73e8;background:rgba(26,115,232,.08);display:flex;align-items:center;white-space:nowrap;padding-right:4px':'border-left:2px solid #bbb;padding-left:4px;font-size:11px;font-weight:700;color:#555;display:flex;align-items:center;white-space:nowrap';
+  const dayLabel=isToday?`${DAYS[d].l} ★今日`:DAYS[d].l;
+  h+=`<div style="position:absolute;left:${x}px;top:0;bottom:0;${dayStyle}">${dayLabel}</div>`;
+  // Sub-labels
+  if(ppd>120){
+    for(let hh=6;hh<24;hh+=6){
+      const xh=x+(hh/24)*ppd;
+      h+=`<div style="position:absolute;left:${xh}px;top:0;bottom:0;border-left:1px solid #ddd;padding-left:3px;font-size:9px;color:#aaa;display:flex;align-items:center">${hh}:00</div>`;
+    }
+  }
+  if(ppd>400){
+    for(let hh=0;hh<24;hh+=2){
+      if(hh%6===0)continue;
+      const xh=x+(hh/24)*ppd;
+      h+=`<div style="position:absolute;left:${xh}px;top:0;bottom:0;border-left:1px solid #eee;padding-left:3px;font-size:9px;color:#ccc;display:flex;align-items:center">${hh}:00</div>`;
+    }
+  }
+}
+h+='</th></tr></thead><tbody>';
+
+D.forEach(cat=>{
+  // Category row: 3 cells
+  h+=`<tr class="cat-row"><td class="col-name">${cat.cat}</td><td class="col-who"></td>`;
+  h+=`<td class="tl-cell" style="width:${w}px;min-width:${w}px"></td></tr>`;
+
+  cat.tasks.forEach(tk=>{
+    const ic=tk.dn?'✅':tk.sg[tk.sg.length-1].t==='client'?'🔴':'🔵';
+    const pc='pt-'+tk.p;
+    h+=`<tr><td class="col-name">${tk.n} <span class="status">${ic}</span></td>`;
+    h+=`<td class="col-who"><span class="ptag ${pc}">${tk.p}</span></td>`;
+    h+=`<td class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px">`;
+
+    // Day gridlines
+    for(let d=0;d<TD;d++){
+      const x=d*ppd;
+      h+=`<div class="gridline day" style="left:${x}px"></div>`;
+      if(ppd>100){for(let hh=6;hh<24;hh+=6){h+=`<div class="gridline hour" style="left:${x+(hh/24)*ppd}px"></div>`;}}
+    }
+
+    // Bars
+    tk.sg.forEach(sg=>{
+      const x=(sg.s/TD)*w, bw=Math.max(((sg.e-sg.s)/TD)*w,3);
+      const showP=bw>28;
+      h+=`<div class="bar ${sg.t}" style="left:${x}px;width:${bw}px" data-t="${sg.tp}\n担当: ${sg.p}">${showP?`<span>${sg.p}</span>`:''}</div>`;
+    });
+
+    if(tk.dn&&tk.en!=null) h+=`<div class="edot" style="left:${(tk.en/TD)*w}px"></div>`;
+    if(ut!=null) h+=`<div class="uline" style="left:${(ut/TD)*w}px"></div>`;
+
+    h+='</td></tr>';
+  });
+});
+h+='</tbody>';
+gt.innerHTML=h;
+
+// tooltip
+const tip=document.getElementById('tip');
+gt.querySelectorAll('.bar').forEach(b=>{
+  b.onmouseenter=()=>{tip.textContent=b.dataset.t;tip.style.display='block';};
+  b.onmousemove=e=>{tip.style.left=Math.min(e.clientX+12,innerWidth-330)+'px';tip.style.top=(e.clientY-48)+'px';};
+  b.onmouseleave=()=>{tip.style.display='none';};
+});
+
+document.getElementById('ts').textContent=UPD;
+// 日付範囲を表示
+const sdl=`${SD.getMonth()+1}/${SD.getDate()}(${W[SD.getDay()]})`;
+const edl=`${NOW_DATE.getMonth()+1}/${NOW_DATE.getDate()}(${W[NOW_DATE.getDay()]})`;
+document.getElementById('dateRange').textContent=`${sdl}〜${edl}（過去30日）`;
+document.getElementById('zl').textContent=zoom<=1?'フィット':Math.round(zoom*100)+'%';
+}
+
+function setZ(nz,px){
+  const oz=zoom;zoom=Math.max(1,Math.min(20,nz));if(Math.abs(zoom-oz)<.001)return;
+  const r=sc.getBoundingClientRect(),L=284;
+  let piv;if(px!=null)piv=(px-r.left-L)+sc.scrollLeft;else{piv=sc.scrollLeft+(r.width-L)/2;}
+  const ow=tlW();// recalc after zoom change? No, need old width
+  // Actually we need old tlW before zoom changed. Hack: temporarily set back
+  const saved=zoom;zoom=oz;const oldW=tlW();zoom=saved;
+  const frac=oldW>0?piv/oldW:0;
+  render();
+  const newW=tlW();
+  if(px!=null)sc.scrollLeft=frac*newW-(px-r.left-L);
+  else sc.scrollLeft=frac*newW-(r.width-L)/2;
+}
+
+sc.addEventListener('wheel',e=>{
+  const r=sc.getBoundingClientRect();if(e.clientX-r.left<284)return;
+  e.preventDefault();setZ(zoom*(e.deltaY>0?.85:1.18),e.clientX);
+},{passive:false});
+
+document.getElementById('zi').onclick=()=>setZ(zoom*1.5,null);
+document.getElementById('zo').onclick=()=>setZ(zoom/1.5,null);
+document.getElementById('zf').onclick=()=>{zoom=1;render();sc.scrollLeft=0;};
+
+// Summary
+const all=D.flatMap(c=>c.tasks);
+const dn=all.filter(t=>t.dn).length;
+const cb=all.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='client').length;
+const tb=all.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='team').length;
+document.getElementById('cards').innerHTML=`
+<div class="card c-green"><b>${dn}/${all.length}</b><small>完了タスク</small></div>
+<div class="card c-red"><b>${cb}</b><small>根本さんボール</small></div>
+<div class="card c-blue"><b>${tb}</b><small>こちらボール</small></div>`;
+
+render();
+addEventListener('resize',()=>{if(zoom<=1)render();});
+</script>
+</body>
+</html>
