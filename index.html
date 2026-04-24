@@ -6,100 +6,204 @@
 <title>SNS運用 ボールトラッカー</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:#1a1a2e;font-size:13px}
-.page{padding:16px 20px}
-h1{font-size:18px;font-weight:700;margin-bottom:2px}
-.sub{font-size:12px;color:#888;margin-bottom:12px}
-.toolbar{display:flex;gap:16px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
-.legend{display:flex;gap:14px;font-size:12px;align-items:center;flex-wrap:wrap}
-.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:middle;margin-right:3px}
-.zctrl{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px}
-.zctrl button{border:1px solid #ccc;background:#fff;border-radius:4px;padding:3px 10px;cursor:pointer;font-weight:700;color:#555}
-.zctrl button:hover{background:#eee}
-.zlabel{min-width:52px;text-align:center;font-weight:600;color:#555}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 5px rgba(99,102,241,.3)}50%{box-shadow:0 0 15px rgba(99,102,241,.6)}}
+body{font-family:-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#0f1729;color:#e2e8f0;font-size:13px;overflow-x:hidden}
+::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-track{background:#1e293b}::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#64748b}
+
+/* === HEADER === */
+.hdr{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);padding:16px 24px;border-bottom:2px solid #6366f1;position:relative;overflow:hidden}
+.hdr::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.hdr-inner{position:relative;z-index:1;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hdr h1{font-size:20px;font-weight:800;background:linear-gradient(90deg,#c7d2fe,#a5b4fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
+.hdr .badge{background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;animation:glow 2s infinite}
+.hdr .upd{margin-left:auto;font-size:12px;color:#a5b4fc}
+.hdr .upd b{color:#fbbf24}
+
+/* === STATS BAR === */
+.stats{display:flex;gap:12px;padding:12px 24px;background:#1e293b;border-bottom:1px solid #334155;flex-wrap:wrap;align-items:center}
+.stat-card{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;border:1px solid #334155;background:#0f172a;min-width:120px}
+.stat-card .num{font-size:22px;font-weight:800;line-height:1}
+.stat-card .lbl{font-size:10px;color:#94a3b8;line-height:1.3}
+.sc-done .num{color:#34d399}.sc-client .num{color:#f87171}.sc-team .num{color:#60a5fa}
+
+/* === CHARACTERS === */
+.chars{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.char{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:20px;border:1px solid #334155;background:#1e293b;cursor:pointer;transition:all .2s}
+.char:hover{border-color:#6366f1;background:#1e1b4b}
+.char.active{border-color:#6366f1;background:#312e81}
+.char .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:2px solid}
+.char .cn{font-size:11px;font-weight:600}.char .cr{font-size:9px;color:#94a3b8}
+
+/* === CONTROLS === */
+.ctrls{display:flex;gap:8px;padding:10px 24px;background:#1a1f36;border-bottom:1px solid #2d3555;align-items:center;flex-wrap:wrap}
+.ctrls .btn{border:1px solid #475569;background:#1e293b;color:#cbd5e1;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s}
+.ctrls .btn:hover{background:#334155;border-color:#6366f1;color:#fff}
+.ctrls .btn.active{background:#4f46e5;border-color:#6366f1;color:#fff}
+.ctrls .sep{width:1px;height:20px;background:#334155;margin:0 4px}
+.ctrls .search{border:1px solid #475569;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:5px 10px;font-size:11px;width:160px;outline:none}
+.ctrls .search:focus{border-color:#6366f1}
+.ctrls .search::placeholder{color:#64748b}
+.filter-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 
 /* === CHART === */
-.chart-wrap{border:1px solid #ddd;border-radius:8px;background:#fff;overflow:hidden}
-.chart-scroll{overflow-x:auto;overflow-y:visible;position:relative}
+.chart-wrap{margin:0;background:#0f172a;overflow:hidden}
+.chart-scroll{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 220px);position:relative}
 table.gantt{border-collapse:collapse;table-layout:fixed}
 table.gantt th,table.gantt td{padding:0;border:none;vertical-align:middle}
 
-/* Left cols */
-.col-name{width:220px;min-width:220px;position:sticky;left:0;z-index:6;background:#fff;border-right:1px solid #e0e0e0;padding:6px 10px !important;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.col-who{width:64px;min-width:64px;position:sticky;left:220px;z-index:6;background:#fff;border-right:1px solid #e0e0e0;text-align:center;padding:4px 2px !important}
-thead .col-name,thead .col-who{background:#f7f7f7;z-index:8;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-tbody tr:hover .col-name,tbody tr:hover .col-who{background:#f3f6ff}
+.col-name{width:240px;min-width:240px;position:sticky;left:0;z-index:6;background:#0f172a;border-right:1px solid #1e293b;padding:7px 12px !important;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background .15s}
+.col-who{width:70px;min-width:70px;position:sticky;left:240px;z-index:6;background:#0f172a;border-right:1px solid #1e293b;text-align:center;padding:4px 2px !important}
+thead .col-name,thead .col-who{background:#1e293b !important;z-index:8;font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0}
+thead tr{position:sticky;top:0;z-index:9}
+tbody tr{transition:background .1s}
+tbody tr:hover .col-name,tbody tr:hover .col-who{background:#1e293b !important}
+tbody tr:hover{background:#1e293b}
+tbody tr.selected .col-name,tbody tr.selected .col-who{background:#1e1b4b !important}
+tbody tr.selected{background:#1e1b4b}
 
-.ptag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;display:inline-block}
-.pt-中谷{background:#dbeafe;color:#1d4ed8}
-.pt-三上{background:#dcfce7;color:#15803d}
-.pt-新山{background:#fef9c3;color:#a16207}
-.pt-浅井{background:#f3e8ff;color:#7c3aed}
-.pt-中谷→三上{background:#dbeafe;color:#1d4ed8}
+.ptag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:inline-block}
+.pt-中谷,.pt-中谷→三上{background:rgba(59,130,246,.2);color:#60a5fa}
+.pt-三上{background:rgba(34,197,94,.2);color:#4ade80}
+.pt-新山{background:rgba(234,179,8,.2);color:#facc15}
+.pt-浅井{background:rgba(168,85,247,.2);color:#c084fc}
 
-.status{font-size:13px;float:right}
+.status-icon{font-size:14px;float:right}
 
-/* Timeline cell */
-.tl-cell{height:32px;position:relative;border-left:1px solid #f0f0f0;padding:0 !important}
-thead .tl-cell{height:28px;border-left:1px solid #ddd;font-size:10px;color:#999;text-align:center;line-height:28px;font-weight:600;overflow:hidden}
-thead .tl-cell.day-start{border-left:2px solid #bbb;color:#555;font-size:11px;font-weight:700}
+.tl-cell{height:34px;position:relative;border-left:1px solid rgba(51,65,85,.3);padding:0 !important}
+thead .tl-cell{height:30px;border-left:1px solid #334155;font-size:10px;color:#64748b;text-align:center;line-height:30px;font-weight:600;overflow:hidden;position:sticky;top:0;background:#1e293b;z-index:7}
 
-/* Category row */
-.cat-row td{background:#f0f0f5;padding:4px 10px !important;font-size:11px;font-weight:700;color:#6366f1}
+.cat-row td{background:#1a1f36 !important;padding:5px 12px !important;font-size:11px;font-weight:700;color:#818cf8;border-top:1px solid #2d3555}
 
 /* Bar */
-.bar{position:absolute;height:18px;top:50%;transform:translateY(-50%);border-radius:3px;z-index:2;cursor:pointer;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.bar:hover{filter:brightness(1.12);z-index:10}
-.bar.team{background:#4285f4}
-.bar.client{background:#ea4335}
-.bar span{font-size:8px;color:rgba(255,255,255,.92);font-weight:700;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{position:absolute;height:20px;top:50%;transform:translateY(-50%);border-radius:4px;z-index:2;cursor:pointer;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:filter .15s,transform .15s}
+.bar:hover{filter:brightness(1.2);transform:translateY(-50%) scaleY(1.3);z-index:10}
+.bar.team{background:linear-gradient(90deg,#3b82f6,#2563eb)}
+.bar.client{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.bar span{font-size:8px;color:rgba(255,255,255,.95);font-weight:700;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* End dot */
-.edot{position:absolute;top:50%;transform:translate(-50%,-50%);width:9px;height:9px;border-radius:50%;background:#34a853;border:2px solid #fff;box-shadow:0 0 0 1px #34a853;z-index:3}
+.edot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#34d399;border:2px solid #0f172a;box-shadow:0 0 6px rgba(52,211,153,.5);z-index:3}
+.uline{position:absolute;top:0;bottom:0;width:2px;background:#fbbf24;z-index:4;pointer-events:none;box-shadow:0 0 8px rgba(251,191,36,.3)}
 
-/* Update line */
-.uline{position:absolute;top:0;bottom:0;width:2px;background:#fbbc04;z-index:4;pointer-events:none}
+/* === DETAIL PANEL === */
+.panel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:50;backdrop-filter:blur(2px)}
+.panel-overlay.show{display:block}
+.detail-panel{position:fixed;top:0;right:0;width:440px;max-width:90vw;height:100vh;background:#1e293b;z-index:51;overflow-y:auto;border-left:2px solid #6366f1;animation:slideIn .25s ease-out;display:none}
+.detail-panel.show{display:block}
+.dp-header{padding:16px 20px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-bottom:1px solid #4338ca;position:sticky;top:0;z-index:2}
+.dp-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#a5b4fc;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:4px}
+.dp-close:hover{background:rgba(99,102,241,.2);color:#fff}
+.dp-title{font-size:15px;font-weight:700;color:#e0e7ff;margin-bottom:4px;padding-right:32px}
+.dp-meta{display:flex;gap:8px;align-items:center;font-size:11px;color:#a5b4fc;flex-wrap:wrap}
+.dp-meta .tag{padding:2px 8px;border-radius:10px;font-weight:600;font-size:10px}
+
+.dp-body{padding:16px 20px}
+.tl-item{display:flex;gap:12px;margin-bottom:0;position:relative}
+.tl-item::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:2px}
+.tl-item:last-child::before{display:none}
+.tl-item.team-seg::before{background:#3b82f6}
+.tl-item.client-seg::before{background:#ef4444}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:2px solid;margin-top:2px}
+.tl-item.team-seg .tl-dot{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
+.tl-item.client-seg .tl-dot{background:rgba(239,68,68,.15);border-color:#ef4444;color:#f87171}
+.tl-content{flex:1;padding-bottom:20px}
+.tl-time{font-size:10px;color:#64748b;margin-bottom:3px;font-weight:600}
+.tl-who{font-size:11px;font-weight:700;margin-bottom:3px}
+.tl-item.team-seg .tl-who{color:#60a5fa}
+.tl-item.client-seg .tl-who{color:#f87171}
+.tl-text{font-size:12px;color:#cbd5e1;line-height:1.6;background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155}
 
 /* Tooltip */
-#tip{display:none;position:fixed;background:#1e293b;color:#fff;padding:8px 12px;border-radius:6px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:320px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+#tip{display:none;position:fixed;background:#1e293b;color:#e2e8f0;padding:10px 14px;border-radius:8px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.4);border:1px solid #334155}
 
-/* Summary */
-.cards{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-.card{flex:1;min-width:130px;padding:12px 14px;border-radius:8px;border:1px solid #e0e0e0;background:#fff}
-.card b{font-size:24px;display:block}
-.card small{font-size:11px;color:#666}
-.c-green b{color:#34a853} .c-red b{color:#ea4335} .c-blue b{color:#4285f4}
+/* Mobile */
+@media(max-width:640px){
+  .stats{padding:8px 12px}.hdr{padding:12px 16px}.ctrls{padding:8px 12px}
+  .col-name{width:160px;min-width:160px}.col-who{width:50px;min-width:50px;left:160px}
+  .chars{display:none}.detail-panel{width:100vw;max-width:100vw}
+}
 </style>
 </head>
 <body>
-<div class="page">
-<h1>SNS運用 ボールトラッカー</h1>
-<div class="sub"><span id="dateRange"></span> | Slack + LINE | ホイールで拡大・縮小 | 最終更新: <b id="ts" style="color:#e8a000">--</b></div>
-<div class="toolbar">
-<div class="legend">
-<span><i style="background:#4285f4"></i>こちらボール</span>
-<span><i style="background:#ea4335"></i>根本さんボール</span>
-<span><i style="background:#34a853;border-radius:50%"></i>完了</span>
-<span><i style="background:#fbbc04"></i>最終更新</span>
-</div>
-<div class="zctrl">
-<button id="zo">−</button><div class="zlabel" id="zl">フィット</div><button id="zi">＋</button>
-<button id="zf" style="font-size:11px;font-weight:500">リセット</button>
-</div>
-</div>
-<div class="chart-wrap"><div class="chart-scroll" id="sc"><table class="gantt" id="gt"></table></div></div>
-<div class="cards" id="cards"></div>
-</div>
-<div id="tip"></div>
-<script>
-// 今日から30日前を起点（翌日になれば自動で範囲がスライド）
-const NOW_DATE=new Date();NOW_DATE.setHours(0,0,0,0);
-const SD=new Date(NOW_DATE);SD.setDate(SD.getDate()-30);
-const TD=31,W=['日','月','火','水','木','金','土'];
-const DAYS=[];for(let i=0;i<TD;i++){const d=new Date(SD);d.setDate(d.getDate()+i);DAYS.push({l:`${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]})`,d});}
-const UPD='2026-04-24 17:21';
-function T(mo,dy,h=0,m=0){const t=new Date(2026,mo-1,dy);return(t-SD)/864e5+(h+m/60)/24;}
 
+<!-- HEADER -->
+<div class="hdr"><div class="hdr-inner">
+  <h1>📡 MISSION BOARD</h1>
+  <span class="badge">SNS OPS</span>
+  <div class="upd">LAST SYNC: <b id="ts">--</b></div>
+</div></div>
+
+<!-- STATS -->
+<div class="stats" id="statsBar">
+  <div class="stat-card sc-done"><div class="num" id="sDone">0</div><div class="lbl">QUEST<br>CLEAR</div></div>
+  <div class="stat-card sc-client"><div class="num" id="sClient">0</div><div class="lbl">根本さん<br>BALL</div></div>
+  <div class="stat-card sc-team"><div class="num" id="sTeam">0</div><div class="lbl">TEAM<br>BALL</div></div>
+  <div class="chars" id="charBar"></div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrls">
+  <span class="filter-label">期間</span>
+  <button class="btn" data-range="7" onclick="setRange(7)">1週間</button>
+  <button class="btn" data-range="14" onclick="setRange(14)">2週間</button>
+  <button class="btn" data-range="30" onclick="setRange(30)">1ヶ月</button>
+  <button class="btn" data-range="0" onclick="setRange(0)">全期間</button>
+  <div class="sep"></div>
+  <span class="filter-label">状態</span>
+  <button class="btn" data-st="all" onclick="setFilter('all')">すべて</button>
+  <button class="btn" data-st="open" onclick="setFilter('open')">未完了</button>
+  <button class="btn" data-st="done" onclick="setFilter('done')">完了</button>
+  <div class="sep"></div>
+  <input class="search" id="searchBox" placeholder="🔍 タスク検索..." oninput="doSearch()">
+  <div class="sep"></div>
+  <span class="filter-label">ズーム</span>
+  <button class="btn" id="zo" onclick="setZ(zoom/1.5)">−</button>
+  <button class="btn" id="zf" onclick="zoom=1;render();sc.scrollLeft=0;">リセット</button>
+  <button class="btn" id="zi" onclick="setZ(zoom*1.5)">＋</button>
+</div>
+
+<!-- CHART -->
+<div class="chart-wrap"><div class="chart-scroll" id="sc"><table class="gantt" id="gt"></table></div></div>
+
+<!-- DETAIL PANEL -->
+<div class="panel-overlay" id="overlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="panel">
+  <div class="dp-header">
+    <button class="dp-close" onclick="closePanel()">✕</button>
+    <div class="dp-title" id="dpTitle"></div>
+    <div class="dp-meta" id="dpMeta"></div>
+  </div>
+  <div class="dp-body" id="dpBody"></div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+// === CONFIG ===
+const MEMBERS={
+  '三上':{icon:'🎯',color:'#4ade80',bg:'rgba(34,197,94,.15)',border:'#22c55e',role:'リサーチャー'},
+  '新山':{icon:'⭐',color:'#facc15',bg:'rgba(234,179,8,.15)',border:'#eab308',role:'クリエイター'},
+  '中谷':{icon:'💎',color:'#60a5fa',bg:'rgba(59,130,246,.15)',border:'#3b82f6',role:'エディター'},
+  '浅井':{icon:'🔮',color:'#c084fc',bg:'rgba(168,85,247,.15)',border:'#a855f7',role:'ディレクター'},
+  '根本':{icon:'👑',color:'#f87171',bg:'rgba(239,68,68,.15)',border:'#ef4444',role:'クライアント'},
+  '青木':{icon:'🏰',color:'#fb923c',bg:'rgba(251,146,39,.15)',border:'#f97316',role:'クライアント'},
+  '伊藤':{icon:'🎨',color:'#2dd4bf',bg:'rgba(45,212,191,.15)',border:'#14b8a6',role:'デザイナー'},
+};
+
+let curRange=7, curFilter='all', curSearch='', curChar=null, zoom=1;
+
+// === TIME ===
+const NOW_DATE=new Date();NOW_DATE.setHours(0,0,0,0);
+const W=['日','月','火','水','木','金','土'];
+const UPD='2026-04-24 17:21';
+
+function T(mo,dy,h=0,m=0){return new Date(2026,mo-1,dy,h,m).getTime();}
+function fmtDate(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]}) ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function daysBetween(a,b){return Math.round((b-a)/864e5);}
+
+// === DATA ===
 const D=[
 {cat:'3月前半',tasks:[
 {n:'地元回り投稿',p:'浅井',dn:true,sg:[
@@ -364,133 +468,212 @@ const D=[
 ]},
 ];
 
-// ====== RENDER ======
-let zoom=1;const sc=document.getElementById('sc'),gt=document.getElementById('gt');
-function tlW(){const a=sc.clientWidth-284;return zoom<=1?Math.max(a,500):a*zoom;}
+// === FLATTEN ===
+const ALL=[];
+D.forEach(cat=>cat.tasks.forEach(tk=>{
+  const st=Math.min(...tk.sg.map(s=>s.s)), et=Math.max(...tk.sg.map(s=>s.e));
+  ALL.push({...tk,cat:cat.cat,_st:st,_et:et});
+}));
 
-function upT(){
-  const m=UPD.match(/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+)/);
-  if(!m)return null;
-  return T(+m[2],+m[3],+m[4],+m[5]);
+// === RENDER ===
+const sc=document.getElementById('sc'),gt=document.getElementById('gt');
+
+function getVisibleRange(){
+  if(curRange===0){
+    const mn=Math.min(...ALL.map(t=>t._st)),mx=Math.max(...ALL.map(t=>t._et));
+    return{start:mn-864e5,end:mx+864e5};
+  }
+  const end=new Date(NOW_DATE);end.setDate(end.getDate()+1);
+  const start=new Date(end);start.setDate(start.getDate()-curRange);
+  return{start:start.getTime(),end:end.getTime()};
+}
+
+function filterTasks(){
+  let tasks=ALL.slice();
+  const{start,end}=getVisibleRange();
+  if(curRange>0) tasks=tasks.filter(t=>t._et>=start && t._st<=end);
+  if(curFilter==='open') tasks=tasks.filter(t=>!t.dn);
+  if(curFilter==='done') tasks=tasks.filter(t=>t.dn);
+  if(curSearch) tasks=tasks.filter(t=>t.n.includes(curSearch)||t.sg.some(s=>s.tp.includes(curSearch)));
+  if(curChar) tasks=tasks.filter(t=>t.p.includes(curChar)||t.sg.some(s=>s.p.includes(curChar)));
+  return tasks;
 }
 
 function render(){
-const w=tlW(),ppd=w/TD,ut=upT();
-let h='';
+  const tasks=filterTasks();
+  const{start,end}=getVisibleRange();
+  const totalMs=end-start;
+  const baseW=sc.clientWidth-310;
+  const w=Math.max(baseW*(zoom<=1?1:zoom),400);
+  const ppMs=w/totalMs;
 
-// ALL rows: 3 cells only (col-name | col-who | single wide timeline cell)
+  // Group by cat
+  const groups={};
+  tasks.forEach(t=>{if(!groups[t.cat])groups[t.cat]=[];groups[t.cat].push(t);});
 
-// Header
-h+='<thead><tr><th class="col-name">タスク名</th><th class="col-who">担当</th>';
-h+=`<th class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px;height:28px">`;
-// Day labels as absolute-positioned divs inside single header cell
-for(let d=0;d<TD;d++){
-  const x=d*ppd;
-  const isToday=DAYS[d].d.getTime()===NOW_DATE.getTime();
-  const dayStyle=isToday?'border-left:2px solid #1a73e8;padding-left:4px;font-size:11px;font-weight:700;color:#1a73e8;background:rgba(26,115,232,.08);display:flex;align-items:center;white-space:nowrap;padding-right:4px':'border-left:2px solid #bbb;padding-left:4px;font-size:11px;font-weight:700;color:#555;display:flex;align-items:center;white-space:nowrap';
-  const dayLabel=isToday?`${DAYS[d].l} ★今日`:DAYS[d].l;
-  h+=`<div style="position:absolute;left:${x}px;top:0;bottom:0;${dayStyle}">${dayLabel}</div>`;
-  // Sub-labels
-  if(ppd>120){
-    for(let hh=6;hh<24;hh+=6){
-      const xh=x+(hh/24)*ppd;
-      h+=`<div style="position:absolute;left:${xh}px;top:0;bottom:0;border-left:1px solid #ddd;padding-left:3px;font-size:9px;color:#aaa;display:flex;align-items:center">${hh}:00</div>`;
-    }
+  let h='<thead><tr><th class="col-name">QUEST</th><th class="col-who">AGENT</th>';
+  h+=`<th class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px;height:30px">`;
+
+  // Day markers
+  const dStart=new Date(start);dStart.setHours(0,0,0,0);
+  for(let d=new Date(dStart);d.getTime()<=end;d.setDate(d.getDate()+1)){
+    const x=(d.getTime()-start)*ppMs;
+    if(x<0)continue;
+    const isToday=d.getTime()===NOW_DATE.getTime();
+    const lbl=`${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]})`;
+    const st=isToday?'border-left:2px solid #818cf8;padding-left:4px;color:#a5b4fc;font-weight:800;background:rgba(99,102,241,.1)':'border-left:1px solid #334155;padding-left:4px;color:#64748b';
+    h+=`<div style="position:absolute;left:${x}px;top:0;bottom:0;${st};font-size:10px;display:flex;align-items:center;white-space:nowrap">${isToday?'★ ':''} ${lbl}</div>`;
   }
-  if(ppd>400){
-    for(let hh=0;hh<24;hh+=2){
-      if(hh%6===0)continue;
-      const xh=x+(hh/24)*ppd;
-      h+=`<div style="position:absolute;left:${xh}px;top:0;bottom:0;border-left:1px solid #eee;padding-left:3px;font-size:9px;color:#ccc;display:flex;align-items:center">${hh}:00</div>`;
-    }
-  }
-}
-h+='</th></tr></thead><tbody>';
+  h+='</th></tr></thead><tbody>';
 
-D.forEach(cat=>{
-  // Category row: 3 cells
-  h+=`<tr class="cat-row"><td class="col-name">${cat.cat}</td><td class="col-who"></td>`;
-  h+=`<td class="tl-cell" style="width:${w}px;min-width:${w}px"></td></tr>`;
+  // UPD line position
+  const updM=UPD.match(/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+)/);
+  const updTs=updM?T(+updM[2],+updM[3],+updM[4],+updM[5]):null;
 
-  cat.tasks.forEach(tk=>{
-    const ic=tk.dn?'✅':tk.sg[tk.sg.length-1].t==='client'?'🔴':'🔵';
-    const pc='pt-'+tk.p;
-    h+=`<tr><td class="col-name">${tk.n} <span class="status">${ic}</span></td>`;
-    h+=`<td class="col-who"><span class="ptag ${pc}">${tk.p}</span></td>`;
-    h+=`<td class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px">`;
+  let idx=0;
+  D.forEach(cat=>{
+    if(!groups[cat.cat])return;
+    h+=`<tr class="cat-row"><td class="col-name">${cat.cat}</td><td class="col-who"></td><td class="tl-cell" style="width:${w}px;min-width:${w}px"></td></tr>`;
 
-    // Day gridlines
-    for(let d=0;d<TD;d++){
-      const x=d*ppd;
-      h+=`<div class="gridline day" style="left:${x}px"></div>`;
-      if(ppd>100){for(let hh=6;hh<24;hh+=6){h+=`<div class="gridline hour" style="left:${x+(hh/24)*ppd}px"></div>`;}}
-    }
+    groups[cat.cat].forEach(tk=>{
+      const ic=tk.dn?'✅':tk.sg[tk.sg.length-1].t==='client'?'🔴':'🔵';
+      const pc='pt-'+tk.p.split('→')[0];
+      h+=`<tr data-idx="${idx}" onclick="openPanel(${idx})"><td class="col-name">${tk.n} <span class="status-icon">${ic}</span></td>`;
+      h+=`<td class="col-who"><span class="ptag ${pc}">${tk.p}</span></td>`;
+      h+=`<td class="tl-cell" style="position:relative;width:${w}px;min-width:${w}px">`;
 
-    // Bars
-    tk.sg.forEach(sg=>{
-      const x=(sg.s/TD)*w, bw=Math.max(((sg.e-sg.s)/TD)*w,3);
-      const showP=bw>28;
-      h+=`<div class="bar ${sg.t}" style="left:${x}px;width:${bw}px" data-t="${sg.tp}\n担当: ${sg.p}">${showP?`<span>${sg.p}</span>`:''}</div>`;
+      tk.sg.forEach(sg=>{
+        const x=Math.max((sg.s-start)*ppMs,0);
+        const x2=Math.min((sg.e-start)*ppMs,w);
+        const bw=Math.max(x2-x,3);
+        if(x2<0||x>w)return;
+        const showP=bw>30;
+        h+=`<div class="bar ${sg.t}" style="left:${x}px;width:${bw}px" data-t="${sg.tp}\n担当: ${sg.p}\n${fmtDate(sg.s)} → ${fmtDate(sg.e)}">${showP?`<span>${sg.p}</span>`:''}</div>`;
+      });
+
+      if(tk.dn&&tk.en!=null){const x=(tk.en-start)*ppMs;if(x>=0&&x<=w)h+=`<div class="edot" style="left:${x}px"></div>`;}
+      if(updTs!=null){const x=(updTs-start)*ppMs;if(x>=0&&x<=w)h+=`<div class="uline" style="left:${x}px"></div>`;}
+
+      h+='</td></tr>';
+      idx++;
     });
-
-    if(tk.dn&&tk.en!=null) h+=`<div class="edot" style="left:${(tk.en/TD)*w}px"></div>`;
-    if(ut!=null) h+=`<div class="uline" style="left:${(ut/TD)*w}px"></div>`;
-
-    h+='</td></tr>';
   });
-});
-h+='</tbody>';
-gt.innerHTML=h;
+  h+='</tbody>';
+  gt.innerHTML=h;
 
-// tooltip
-const tip=document.getElementById('tip');
-gt.querySelectorAll('.bar').forEach(b=>{
-  b.onmouseenter=()=>{tip.textContent=b.dataset.t;tip.style.display='block';};
-  b.onmousemove=e=>{tip.style.left=Math.min(e.clientX+12,innerWidth-330)+'px';tip.style.top=(e.clientY-48)+'px';};
-  b.onmouseleave=()=>{tip.style.display='none';};
-});
+  // tooltip
+  const tip=document.getElementById('tip');
+  gt.querySelectorAll('.bar').forEach(b=>{
+    b.onmouseenter=e=>{e.stopPropagation();tip.textContent=b.dataset.t;tip.style.display='block';};
+    b.onmousemove=e=>{tip.style.left=Math.min(e.clientX+12,innerWidth-350)+'px';tip.style.top=(e.clientY-60)+'px';};
+    b.onmouseleave=()=>{tip.style.display='none';};
+    b.onclick=e=>e.stopPropagation();
+  });
 
-document.getElementById('ts').textContent=UPD;
-// 日付範囲を表示
-const sdl=`${SD.getMonth()+1}/${SD.getDate()}(${W[SD.getDay()]})`;
-const edl=`${NOW_DATE.getMonth()+1}/${NOW_DATE.getDate()}(${W[NOW_DATE.getDay()]})`;
-document.getElementById('dateRange').textContent=`${sdl}〜${edl}（過去30日）`;
-document.getElementById('zl').textContent=zoom<=1?'フィット':Math.round(zoom*100)+'%';
+  document.getElementById('ts').textContent=UPD;
+  updateStats();
+  updateBtns();
 }
 
-function setZ(nz,px){
-  const oz=zoom;zoom=Math.max(1,Math.min(20,nz));if(Math.abs(zoom-oz)<.001)return;
-  const r=sc.getBoundingClientRect(),L=284;
-  let piv;if(px!=null)piv=(px-r.left-L)+sc.scrollLeft;else{piv=sc.scrollLeft+(r.width-L)/2;}
-  const ow=tlW();// recalc after zoom change? No, need old width
-  // Actually we need old tlW before zoom changed. Hack: temporarily set back
-  const saved=zoom;zoom=oz;const oldW=tlW();zoom=saved;
-  const frac=oldW>0?piv/oldW:0;
-  render();
-  const newW=tlW();
-  if(px!=null)sc.scrollLeft=frac*newW-(px-r.left-L);
-  else sc.scrollLeft=frac*newW-(r.width-L)/2;
+// === STATS ===
+function updateStats(){
+  const dn=ALL.filter(t=>t.dn).length;
+  const cb=ALL.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='client').length;
+  const tb=ALL.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='team').length;
+  document.getElementById('sDone').textContent=`${dn}/${ALL.length}`;
+  document.getElementById('sClient').textContent=cb;
+  document.getElementById('sTeam').textContent=tb;
 }
+
+// === CHARACTERS ===
+function renderChars(){
+  const counts={};
+  ALL.forEach(t=>{
+    const m=t.p.split('→')[0].split('・')[0];
+    if(!counts[m])counts[m]={done:0,total:0};
+    counts[m].total++;if(t.dn)counts[m].done++;
+  });
+  let h='';
+  Object.entries(MEMBERS).forEach(([name,m])=>{
+    if(!counts[name]&&name!=='根本'&&name!=='青木')return;
+    const c=counts[name]||{done:0,total:0};
+    const active=curChar===name?'active':'';
+    h+=`<div class="char ${active}" onclick="toggleChar('${name}')">
+      <div class="av" style="background:${m.bg};border-color:${m.border};color:${m.color}">${m.icon}</div>
+      <div><div class="cn" style="color:${m.color}">${name}</div><div class="cr">${m.role}</div></div>
+    </div>`;
+  });
+  document.getElementById('charBar').innerHTML=h;
+}
+
+function toggleChar(name){curChar=curChar===name?null:name;render();renderChars();}
+
+// === CONTROLS ===
+function setRange(r){curRange=r;render();}
+function setFilter(f){curFilter=f;render();}
+function doSearch(){curSearch=document.getElementById('searchBox').value;render();}
+function updateBtns(){
+  document.querySelectorAll('[data-range]').forEach(b=>b.classList.toggle('active',+b.dataset.range===curRange));
+  document.querySelectorAll('[data-st]').forEach(b=>b.classList.toggle('active',b.dataset.st===curFilter));
+}
+function setZ(nz){zoom=Math.max(1,Math.min(20,nz));render();}
 
 sc.addEventListener('wheel',e=>{
-  const r=sc.getBoundingClientRect();if(e.clientX-r.left<284)return;
-  e.preventDefault();setZ(zoom*(e.deltaY>0?.85:1.18),e.clientX);
+  const r=sc.getBoundingClientRect();if(e.clientX-r.left<310)return;
+  e.preventDefault();setZ(zoom*(e.deltaY>0?.85:1.18));
 },{passive:false});
 
-document.getElementById('zi').onclick=()=>setZ(zoom*1.5,null);
-document.getElementById('zo').onclick=()=>setZ(zoom/1.5,null);
-document.getElementById('zf').onclick=()=>{zoom=1;render();sc.scrollLeft=0;};
+// === DETAIL PANEL ===
+function openPanel(idx){
+  const tasks=filterTasks();
+  const tk=tasks[idx];if(!tk)return;
 
-// Summary
-const all=D.flatMap(c=>c.tasks);
-const dn=all.filter(t=>t.dn).length;
-const cb=all.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='client').length;
-const tb=all.filter(t=>!t.dn&&t.sg[t.sg.length-1].t==='team').length;
-document.getElementById('cards').innerHTML=`
-<div class="card c-green"><b>${dn}/${all.length}</b><small>完了タスク</small></div>
-<div class="card c-red"><b>${cb}</b><small>根本さんボール</small></div>
-<div class="card c-blue"><b>${tb}</b><small>こちらボール</small></div>`;
+  const ic=tk.dn?'✅ QUEST CLEAR':tk.sg[tk.sg.length-1].t==='client'?'🔴 根本さんボール':'🔵 チームボール';
+  const m=MEMBERS[tk.p.split('→')[0]]||{icon:'📋',color:'#94a3b8'};
+  document.getElementById('dpTitle').textContent=tk.n;
+  document.getElementById('dpMeta').innerHTML=`
+    <span class="tag" style="background:${tk.dn?'rgba(52,211,153,.2);color:#34d399':tk.sg[tk.sg.length-1].t==='client'?'rgba(248,113,113,.2);color:#f87171':'rgba(96,165,250,.2);color:#60a5fa'}">${ic}</span>
+    <span>担当: ${tk.p}</span>
+    <span>セグメント: ${tk.sg.length}</span>`;
 
+  let body='<div style="margin-bottom:12px;font-size:11px;color:#64748b">📜 タスクの経緯（クリックで展開）</div>';
+  tk.sg.forEach((sg,i)=>{
+    const cls=sg.t==='team'?'team-seg':'client-seg';
+    const pm=MEMBERS[sg.p]||{icon:'📋',color:'#94a3b8'};
+    const dur=sg.e-sg.s;
+    const durH=Math.floor(dur/36e5);const durM=Math.floor((dur%36e5)/6e4);
+    const durStr=durH>24?`${Math.round(durH/24)}日`:(durH>0?`${durH}時間${durM>0?durM+'分':''}`:`${durM}分`);
+    body+=`<div class="tl-item ${cls}" style="animation:fadeIn .3s ease-out ${i*.08}s both">
+      <div class="tl-dot">${pm.icon||'📋'}</div>
+      <div class="tl-content">
+        <div class="tl-time">${fmtDate(sg.s)} → ${fmtDate(sg.e)}（${durStr}）</div>
+        <div class="tl-who">${sg.p} ${sg.t==='team'?'🔵':'🔴'}</div>
+        <div class="tl-text">${sg.tp}</div>
+      </div>
+    </div>`;
+  });
+
+  if(tk.dn&&tk.en){
+    body+=`<div style="text-align:center;padding:16px;font-size:14px;color:#34d399;font-weight:700">✅ QUEST CLEAR — ${fmtDate(tk.en)}</div>`;
+  }
+
+  document.getElementById('dpBody').innerHTML=body;
+  document.getElementById('panel').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+  document.querySelectorAll('tr.selected').forEach(r=>r.classList.remove('selected'));
+  const row=document.querySelector(`tr[data-idx="${idx}"]`);
+  if(row)row.classList.add('selected');
+}
+
+function closePanel(){
+  document.getElementById('panel').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('tr.selected').forEach(r=>r.classList.remove('selected'));
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+
+// === INIT ===
+renderChars();
 render();
 addEventListener('resize',()=>{if(zoom<=1)render();});
 </script>
