@@ -113,7 +113,12 @@ thead .tl-cell{height:30px;border-left:1px solid #334155;font-size:10px;color:#6
 .tl-who{font-size:11px;font-weight:700;margin-bottom:3px}
 .tl-item.team-seg .tl-who{color:#60a5fa}
 .tl-item.client-seg .tl-who{color:#f87171}
-.tl-text{font-size:12px;color:#cbd5e1;line-height:1.6;background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155}
+.tl-text{font-size:12px;color:#cbd5e1;line-height:1.6;background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155;cursor:pointer;transition:border-color .2s}
+.tl-text:hover{border-color:#6366f1}
+.tl-text .raw-toggle{font-size:10px;color:#6366f1;margin-top:4px;display:inline-block}
+.tl-raw{display:none;margin-top:8px;font-size:11px;color:#94a3b8;line-height:1.7;background:#0b1120;padding:10px 14px;border-radius:6px;border:1px solid #1e293b;white-space:pre-wrap;word-break:break-word;font-family:'Noto Sans JP',sans-serif}
+.tl-raw.show{display:block;animation:fadeIn .2s ease-out}
+.tl-raw .raw-label{font-size:9px;color:#6366f1;font-weight:700;letter-spacing:.5px;margin-bottom:6px;display:block}
 
 /* Tooltip */
 #tip{display:none;position:fixed;background:#1e293b;color:#e2e8f0;padding:10px 14px;border-radius:8px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.4);border:1px solid #334155}
@@ -460,20 +465,20 @@ const D=[
 {s:T(4,26,17,54),e:T(4,28,9,22),t:'client',p:'根本',tp:'根本が要点+写真提供(4/25撮影・顔出しOK)急がないが投稿案作成依頼'},
 ]},
 {n:'上杉議員IGリポスト',p:'中谷',dn:true,sg:[
-{s:T(4,27,19,24),e:T(4,27,19,40),t:'team',p:'中谷',tp:'中谷が上杉議員のIG言及を発見→返信/リポスト提案'},
-{s:T(4,27,19,40),e:T(4,27,20,56),t:'team',p:'中谷',tp:'根本が返信文承認→中谷がIGリポスト完了(20:56完了報告)'},
+{s:T(4,27,19,24),e:T(4,27,19,40),t:'team',p:'中谷',tp:'中谷が上杉議員のIG言及を発見→返信/リポスト提案',raw:'@根本拓 @channel\n立て続けに失礼いたします。\n上杉議員がInstagramにて、根本さんに言及してくださっていたので返信やリポストをするのはいかがでしょうか？\n\n返信例\n==========\n今後も地域のために共に課題に取り組んでいきましょう！'},
+{s:T(4,27,19,40),e:T(4,27,20,56),t:'team',p:'中谷',tp:'根本が返信文承認→中谷がIGリポスト完了(20:56完了報告)',raw:'【根本】@中谷陽保 ありがとうございます！\n以下でお願いいたします。\n\n==========\nありがとうございます。ぜひ今後も福島のために一緒に課題に取り組ませてください！\n\n【完了報告 by 中谷】\n@channel\n上杉議員のInstagramのリポストが完了しました。\n(リンクはもとの投稿です)'},
 ],en:T(4,27,20,56)},
 {n:'国交委切り抜き②コンパクトシティ',p:'中谷',dn:false,sg:[
 {s:T(4,27,18,9),e:T(4,27,18,12),t:'team',p:'中谷',tp:'中谷が2案提案(①イラン情勢②コンパクトシティ)'},
-{s:T(4,27,18,12),e:T(4,28,9,22),t:'team',p:'中谷',tp:'根本「①は情報古い、②良い」→中谷が②切り抜き作成中'},
+{s:T(4,27,18,12),e:T(4,28,9,22),t:'team',p:'中谷',tp:'根本「①は情報古い、②良い」→中谷が②切り抜き作成中',raw:'@中谷陽保 ①は少しもう情報として古くなってしまっているかなぁという気もしたのですが、どうでしょうか？\n②は良いと思います！　まずは②を作ってみてもらえるでしょうか？'},
 ]},
 {n:'船引バイパス安全対策 動画',p:'新山',dn:true,sg:[
 {s:T(4,27,18,9),e:T(4,27,23,30),t:'team',p:'新山',tp:'新山がX/IG/FB/YouTube/TikTokに投稿完了(23:30完了報告)'},
 ],en:T(4,27,23,30)},
 {n:'拓メシ アスパラガス(松浦農園)',p:'新山',dn:false,sg:[
-{s:T(4,27,22,37),e:T(4,27,23,48),t:'client',p:'根本',tp:'根本が案文+写真付きで新規投稿依頼(郡山市田村町BBQでアスパラガス堪能)'},
-{s:T(4,27,23,48),e:T(4,28,7,22),t:'team',p:'新山',tp:'新山が投稿案+画像4枚提出+3点相談(①松浦IGメンション②味わい表現③画像テキスト)'},
-{s:T(4,28,7,22),e:T(4,28,9,22),t:'team',p:'新山',tp:'根本「①メンション+リポスト+フォローお願い②甘くてみずみずしい③シンプルに」承認→投稿実行待ち'},
+{s:T(4,27,22,37),e:T(4,27,23,48),t:'client',p:'根本',tp:'根本が案文+写真付きで新規投稿依頼(郡山市田村町BBQでアスパラガス堪能)',raw:'```今日の拓メシ```\n@channel 新規投稿の作成をお願いします。\n===============\n松浦農園・松浦昇さんのアスパラガス\n・郡山市田村町でのバーベキューで松浦昇さんのこだわりのアスパラガスを堪能。\n・こんなに美味しいアスパラガスは初めてで、お肉そっちのけでアスパラガスを食べ続けました笑\n・愛情館、あぐりあ、ベレッシュなどで買えます！（売り切れ注意です！）'},
+{s:T(4,27,23,48),e:T(4,28,7,22),t:'team',p:'新山',tp:'新山が投稿案+画像4枚提出+3点相談(①松浦IGメンション②味わい表現③画像テキスト)',raw:'@根本拓\n\nお疲れ様です。\n投稿案を作成したのでご確認をよろしくお願いいたします。\n\nまた、ご相談したいことが3点ございます。\n①松浦昇さんのInstagramはメンションされますか。また、松浦昇さんが同BBQの画像を投稿していますが、リポストいたしますか（画像4枚目）。\n②キャプションの「こんなに美味しいアスパラガスは初めてで」について、\n→「こんなに甘くてみずみずしいアスパラガスは初めてで」\nのように、味わいがより伝わる表現にするのはいかがでしょうか。\n ③画像内テキストの文言について迷っております。ご意見やアドバイスがございましたらご教示いただけますと幸いです。\n\n=====\n郡山市田村町でのバーベキューで、松浦昇さんこだわりのアスパラガスを堪能しました！\n\nこんなに美味しいアスパラガスは初めてで、お肉そっちのけで食べ続けてしまいました笑\n\n愛情館・あぐりあ・ベレッシュなどで購入できます！（売り切れ注意です！）'},
+{s:T(4,28,7,22),e:T(4,28,9,22),t:'team',p:'新山',tp:'根本「①メンション+リポスト+フォローお願い②甘くてみずみずしい③シンプルに」承認→投稿実行待ち',raw:'@新山琴子（にいやまことこ） 早速にありがとうございます！\n\n①はメンションと松浦さん投稿のリポストをお願いします！　また松浦さんアカウントのフォローもお願いします。\n②は「甘くてみずみずしい」でお願いします。\n③はシンプルなひとつめが良いかと思いました！'},
 ]},
 {n:'福島再生土 防衛省・最高裁利用',p:'三上',dn:true,sg:[
 {s:T(4,23,9,45),e:T(4,23,9,53),t:'client',p:'根本',tp:'三上が日経・福島民友記事から投稿提案→根本確認'},
@@ -496,7 +501,7 @@ const D=[
 {s:T(4,26,0,2),e:T(4,26,16,18),t:'client',p:'根本',tp:'根本が追加写真(OECD当時)+冒頭文修正提案→チームレビュー待ち'},
 {s:T(4,26,16,18),e:T(4,26,17,24),t:'team',p:'中谷',tp:'中谷が投稿文リライト+写真3枚構成提案→根本確認待ち'},
 {s:T(4,26,17,24),e:T(4,27,0,49),t:'team',p:'中谷',tp:'根本が承認+微修正した最終版提示「写真の順番も異存ない」→中谷投稿実行待ち'},
-{s:T(4,27,0,49),e:T(4,28,9,22),t:'team',p:'中谷',tp:'中谷が根本修正版で投稿する旨確認+他投稿とタイミング調整中→投稿時期決定次第報告'},
+{s:T(4,27,0,49),e:T(4,28,9,22),t:'team',p:'中谷',tp:'中谷が根本修正版で投稿する旨確認+他投稿とタイミング調整中→投稿時期決定次第報告',raw:'@根本拓\nご確認くださりありがとうございます。\n投稿文については、修正いただいたものを使用いたします。\nまた、投稿のタイミングについてですが、船引バイパスの動画など他の投稿と調整し、タイミングが決定したら報告いたします。'},
 ]},
 {n:'知的財産小委員会 新規投稿',p:'新山',dn:true,sg:[
 {s:T(4,25,7,26),e:T(4,25,23,40),t:'client',p:'根本',tp:'根本が案文+写真選定依頼→23:40に写真7枚提供+新山三上中谷メンション'},
@@ -686,7 +691,7 @@ function openPanel(idx){
       <div class="tl-content">
         <div class="tl-time">${fmtDate(sg.s)} → ${fmtDate(sg.e)}（${durStr}）</div>
         <div class="tl-who">${sg.p} ${sg.t==='team'?'🔵':'🔴'}</div>
-        <div class="tl-text">${sg.tp}</div>
+        <div class="tl-text" ${sg.raw?`onclick="this.querySelector('.tl-raw').classList.toggle('show')"`:''}>${sg.tp}${sg.raw?`<span class="raw-toggle">▼ 原文を見る</span><div class="tl-raw"><span class="raw-label">ORIGINAL MESSAGE</span>${sg.raw.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`:''}</div>
       </div>
     </div>`;
   });
