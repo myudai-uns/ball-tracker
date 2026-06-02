@@ -5,46 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SNS運用 ボールトラッカー</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes glow{0%,100%{box-shadow:0 0 5px rgba(99,102,241,.3)}50%{box-shadow:0 0 15px rgba(99,102,241,.6)}}
-body{font-family:-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#0f1729;color:#e2e8f0;font-size:13px;overflow-x:hidden}
-::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-track{background:#1e293b}::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#64748b}
+/* ===========================================================
+   引き算の美学 — フラット / 角丸なし / グラデーションなし / 発光なし
+   =========================================================== */
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0 !important}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+body{font-family:-apple-system,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:#0f172a;color:#e2e8f0;font-size:13px;overflow-x:hidden}
+::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-track{background:#1e293b}::-webkit-scrollbar-thumb{background:#475569}::-webkit-scrollbar-thumb:hover{background:#64748b}
 
 /* === HEADER === */
-.hdr{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);padding:16px 24px;border-bottom:2px solid #6366f1;position:relative;overflow:hidden}
-.hdr::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
-.hdr-inner{position:relative;z-index:1;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.hdr h1{font-size:20px;font-weight:800;background:linear-gradient(90deg,#c7d2fe,#a5b4fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px}
-.hdr .badge{background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;animation:glow 2s infinite}
-.hdr .upd{margin-left:auto;font-size:12px;color:#a5b4fc}
-.hdr .upd b{color:#fbbf24}
+.hdr{background:#1e293b;padding:16px 24px;border-bottom:1px solid #334155}
+.hdr-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hdr h1{font-size:18px;font-weight:700;color:#e2e8f0;letter-spacing:.5px}
+.hdr .badge{background:transparent;color:#94a3b8;font-size:10px;padding:2px 8px;font-weight:600;border:1px solid #334155}
+.hdr .upd{margin-left:auto;font-size:12px;color:#94a3b8}
+.hdr .upd b{color:#e2e8f0;font-weight:600}
 
 /* === STATS BAR === */
-.stats{display:flex;gap:12px;padding:12px 24px;background:#1e293b;border-bottom:1px solid #334155;flex-wrap:wrap;align-items:center}
-.stat-card{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;border:1px solid #334155;background:#0f172a;min-width:120px}
-.stat-card .num{font-size:22px;font-weight:800;line-height:1}
+.stats{display:flex;gap:12px;padding:12px 24px;background:#0f172a;border-bottom:1px solid #1e293b;flex-wrap:wrap;align-items:center}
+.stat-card{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid #1e293b;background:#0f172a;min-width:120px}
+.stat-card .num{font-size:22px;font-weight:700;line-height:1}
 .stat-card .lbl{font-size:10px;color:#94a3b8;line-height:1.3}
 .sc-done .num{color:#34d399}.sc-client .num{color:#f87171}.sc-team .num{color:#60a5fa}
 
 /* === CHARACTERS === */
 .chars{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
-.char{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:20px;border:1px solid #334155;background:#1e293b;cursor:pointer;transition:all .2s}
-.char:hover{border-color:#6366f1;background:#1e1b4b}
-.char.active{border-color:#6366f1;background:#312e81}
-.char .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:2px solid}
+.char{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #1e293b;background:#0f172a;cursor:pointer;transition:border-color .15s}
+.char:hover{border-color:#475569}
+.char.active{border-color:#94a3b8;background:#1e293b}
+.char .av{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:1px solid}
 .char .cn{font-size:11px;font-weight:600}.char .cr{font-size:9px;color:#94a3b8}
 
 /* === CONTROLS === */
-.ctrls{display:flex;gap:8px;padding:10px 24px;background:#1a1f36;border-bottom:1px solid #2d3555;align-items:center;flex-wrap:wrap}
-.ctrls .btn{border:1px solid #475569;background:#1e293b;color:#cbd5e1;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s}
-.ctrls .btn:hover{background:#334155;border-color:#6366f1;color:#fff}
-.ctrls .btn.active{background:#4f46e5;border-color:#6366f1;color:#fff}
-.ctrls .sep{width:1px;height:20px;background:#334155;margin:0 4px}
-.ctrls .search{border:1px solid #475569;background:#0f172a;color:#e2e8f0;border-radius:6px;padding:5px 10px;font-size:11px;width:160px;outline:none}
-.ctrls .search:focus{border-color:#6366f1}
+.ctrls{display:flex;gap:8px;padding:10px 24px;background:#0f172a;border-bottom:1px solid #1e293b;align-items:center;flex-wrap:wrap}
+.ctrls .btn{border:1px solid #334155;background:transparent;color:#cbd5e1;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;transition:border-color .15s,color .15s}
+.ctrls .btn:hover{border-color:#64748b;color:#fff}
+.ctrls .btn.active{background:#e2e8f0;border-color:#e2e8f0;color:#0f172a}
+.ctrls .sep{width:1px;height:20px;background:#1e293b;margin:0 4px}
+.ctrls .search{border:1px solid #334155;background:#0f172a;color:#e2e8f0;padding:5px 10px;font-size:11px;width:160px;outline:none}
+.ctrls .search:focus{border-color:#64748b}
 .ctrls .search::placeholder{color:#64748b}
 .filter-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 
@@ -61,67 +61,67 @@ thead tr{position:sticky;top:0;z-index:9}
 tbody tr{transition:background .1s}
 tbody tr:hover .col-name,tbody tr:hover .col-who{background:#1e293b !important}
 tbody tr:hover{background:#1e293b}
-tbody tr.selected .col-name,tbody tr.selected .col-who{background:#1e1b4b !important}
-tbody tr.selected{background:#1e1b4b}
+tbody tr.selected .col-name,tbody tr.selected .col-who{background:#1e293b !important}
+tbody tr.selected{background:#1e293b}
 
-.ptag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:inline-block}
-.pt-中谷,.pt-中谷→三上{background:rgba(59,130,246,.2);color:#60a5fa}
-.pt-三上{background:rgba(34,197,94,.2);color:#4ade80}
-.pt-新山{background:rgba(234,179,8,.2);color:#facc15}
-.pt-浅井{background:rgba(168,85,247,.2);color:#c084fc}
+.ptag{font-size:10px;font-weight:700;padding:2px 7px;display:inline-block}
+.pt-中谷,.pt-中谷→三上{background:rgba(59,130,246,.15);color:#60a5fa}
+.pt-三上{background:rgba(34,197,94,.15);color:#4ade80}
+.pt-新山{background:rgba(234,179,8,.15);color:#facc15}
+.pt-浅井{background:rgba(168,85,247,.15);color:#c084fc}
 
 .status-icon{font-size:14px;float:right}
 
 .tl-cell{height:34px;position:relative;border-left:1px solid rgba(51,65,85,.3);padding:0 !important}
 thead .tl-cell{height:30px;border-left:1px solid #334155;font-size:10px;color:#64748b;text-align:center;line-height:30px;font-weight:600;overflow:hidden;position:sticky;top:0;background:#1e293b;z-index:7}
 
-.cat-row td{background:#1a1f36 !important;padding:5px 12px !important;font-size:11px;font-weight:700;color:#818cf8;border-top:1px solid #2d3555}
+.cat-row td{background:#1e293b !important;padding:5px 12px !important;font-size:11px;font-weight:700;color:#94a3b8;border-top:1px solid #334155}
 
 /* Bar */
-.bar{position:absolute;height:20px;top:50%;transform:translateY(-50%);border-radius:4px;z-index:2;cursor:pointer;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:filter .15s,transform .15s}
-.bar:hover{filter:brightness(1.2);transform:translateY(-50%) scaleY(1.3);z-index:10}
-.bar.team{background:linear-gradient(90deg,#3b82f6,#2563eb)}
-.bar.client{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.bar{position:absolute;height:18px;top:50%;transform:translateY(-50%);z-index:2;cursor:pointer;min-width:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:filter .15s}
+.bar:hover{filter:brightness(1.15);z-index:10}
+.bar.team{background:#3b82f6}
+.bar.client{background:#ef4444}
 .bar span{font-size:8px;color:rgba(255,255,255,.95);font-weight:700;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.edot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#34d399;border:2px solid #0f172a;box-shadow:0 0 6px rgba(52,211,153,.5);z-index:3}
-.uline{position:absolute;top:0;bottom:0;width:2px;background:#fbbf24;z-index:4;pointer-events:none;box-shadow:0 0 8px rgba(251,191,36,.3)}
+.edot{position:absolute;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;background:#34d399;z-index:3}
+.uline{position:absolute;top:0;bottom:0;width:1px;background:#e2e8f0;z-index:4;pointer-events:none}
 
 /* === DETAIL PANEL === */
-.panel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:50;backdrop-filter:blur(2px)}
+.panel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:50}
 .panel-overlay.show{display:block}
-.detail-panel{position:fixed;top:0;right:0;width:440px;max-width:90vw;height:100vh;background:#1e293b;z-index:51;overflow-y:auto;border-left:2px solid #6366f1;animation:slideIn .25s ease-out;display:none}
+.detail-panel{position:fixed;top:0;right:0;width:440px;max-width:90vw;height:100vh;background:#1e293b;z-index:51;overflow-y:auto;border-left:1px solid #334155;animation:slideIn .2s ease-out;display:none}
 .detail-panel.show{display:block}
-.dp-header{padding:16px 20px;background:linear-gradient(135deg,#1e1b4b,#312e81);border-bottom:1px solid #4338ca;position:sticky;top:0;z-index:2}
-.dp-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#a5b4fc;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:4px}
-.dp-close:hover{background:rgba(99,102,241,.2);color:#fff}
-.dp-title{font-size:15px;font-weight:700;color:#e0e7ff;margin-bottom:4px;padding-right:32px}
-.dp-meta{display:flex;gap:8px;align-items:center;font-size:11px;color:#a5b4fc;flex-wrap:wrap}
-.dp-meta .tag{padding:2px 8px;border-radius:10px;font-weight:600;font-size:10px}
+.dp-header{padding:16px 20px;background:#0f172a;border-bottom:1px solid #334155;position:sticky;top:0;z-index:2}
+.dp-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:4px 8px}
+.dp-close:hover{color:#fff}
+.dp-title{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:4px;padding-right:32px}
+.dp-meta{display:flex;gap:8px;align-items:center;font-size:11px;color:#94a3b8;flex-wrap:wrap}
+.dp-meta .tag{padding:2px 8px;font-weight:600;font-size:10px}
 
 .dp-body{padding:16px 20px}
 .tl-item{display:flex;gap:12px;margin-bottom:0;position:relative}
-.tl-item::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:2px}
+.tl-item::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px}
 .tl-item:last-child::before{display:none}
-.tl-item.team-seg::before{background:#3b82f6}
-.tl-item.client-seg::before{background:#ef4444}
-.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:2px solid;margin-top:2px}
-.tl-item.team-seg .tl-dot{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa}
-.tl-item.client-seg .tl-dot{background:rgba(239,68,68,.15);border-color:#ef4444;color:#f87171}
+.tl-item.team-seg::before{background:#334155}
+.tl-item.client-seg::before{background:#334155}
+.tl-dot{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid;margin-top:2px}
+.tl-item.team-seg .tl-dot{background:rgba(59,130,246,.12);border-color:#3b82f6;color:#60a5fa}
+.tl-item.client-seg .tl-dot{background:rgba(239,68,68,.12);border-color:#ef4444;color:#f87171}
 .tl-content{flex:1;padding-bottom:20px}
 .tl-time{font-size:10px;color:#64748b;margin-bottom:3px;font-weight:600}
 .tl-who{font-size:11px;font-weight:700;margin-bottom:3px}
 .tl-item.team-seg .tl-who{color:#60a5fa}
 .tl-item.client-seg .tl-who{color:#f87171}
-.tl-text{font-size:12px;color:#cbd5e1;line-height:1.6;background:#0f172a;padding:10px 14px;border-radius:8px;border:1px solid #334155;cursor:pointer;transition:border-color .2s}
-.tl-text:hover{border-color:#6366f1}
-.tl-text .raw-toggle{font-size:10px;color:#6366f1;margin-top:4px;display:inline-block}
-.tl-raw{display:none;margin-top:8px;font-size:11px;color:#94a3b8;line-height:1.7;background:#0b1120;padding:10px 14px;border-radius:6px;border:1px solid #1e293b;white-space:pre-wrap;word-break:break-word;font-family:'Noto Sans JP',sans-serif}
+.tl-text{font-size:12px;color:#cbd5e1;line-height:1.6;background:#0f172a;padding:10px 14px;border:1px solid #1e293b;cursor:pointer;transition:border-color .2s}
+.tl-text:hover{border-color:#475569}
+.tl-text .raw-toggle{font-size:10px;color:#94a3b8;margin-top:4px;display:inline-block}
+.tl-raw{display:none;margin-top:8px;font-size:11px;color:#94a3b8;line-height:1.7;background:#0b1120;padding:10px 14px;border:1px solid #1e293b;white-space:pre-wrap;word-break:break-word;font-family:'Noto Sans JP',sans-serif}
 .tl-raw.show{display:block;animation:fadeIn .2s ease-out}
-.tl-raw .raw-label{font-size:9px;color:#6366f1;font-weight:700;letter-spacing:.5px;margin-bottom:6px;display:block}
+.tl-raw .raw-label{font-size:9px;color:#94a3b8;font-weight:700;letter-spacing:.5px;margin-bottom:6px;display:block}
 
 /* Tooltip */
-#tip{display:none;position:fixed;background:#1e293b;color:#e2e8f0;padding:10px 14px;border-radius:8px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.4);border:1px solid #334155}
+#tip{display:none;position:fixed;background:#1e293b;color:#e2e8f0;padding:10px 14px;font-size:11px;line-height:1.6;white-space:pre-line;z-index:999;pointer-events:none;max-width:340px;border:1px solid #334155}
 
 /* Mobile */
 @media(max-width:640px){
@@ -202,7 +202,7 @@ let curRange=7, curFilter='all', curSearch='', curChar=null, zoom=1;
 // === TIME ===
 const NOW_DATE=new Date();NOW_DATE.setHours(0,0,0,0);
 const W=['日','月','火','水','木','金','土'];
-const UPD='2026-06-01 14:05';
+const UPD='2026-06-02 16:00';
 
 function T(mo,dy,h=0,m=0){return new Date(2026,mo-1,dy,h,m).getTime();}
 function fmtDate(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]}) ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
@@ -419,9 +419,9 @@ const D=[
 {s:T(4,18,0,35),e:T(4,18,23,49),t:'client',p:'根本',tp:'根本「投票のくだりカット」指示(LINE)'},
 {s:T(4,18,23,49),e:T(4,19,18,32),t:'team',p:'新山',tp:'新山が最終修正→X/FB/IG/YT/TikTok投稿完了'},
 ],en:T(4,19,18,32)},
-{n:'お花見動画(夜・笹原川オフタイム)',p:'新山',dn:false,sg:[
+{n:'お花見動画(夜・笹原川オフタイム)（打切）',p:'新山',dn:true,en:T(5,25,18),sg:[
 {s:T(4,13,23,16),e:T(4,18,0,36),t:'team',p:'新山',tp:'根本がオフタイム風編集提案→新山が仮案完成(LINE)'},
-{s:T(4,18,0,36),e:T(6,1,14,5),t:'client',p:'根本',tp:'根本「もうちょっとこうしたい、来週末でOK」フィードバック検討中'},
+{s:T(4,18,0,36),e:T(5,25,18),t:'client',p:'根本',tp:'根本「もうちょっとこうしたい、来週末でOK」フィードバック検討中→5/25(日)時点で進展なく打切'},
 ]},
 {n:'TikTok復旧・公式アカウント申請',p:'浅井',dn:true,sg:[
 {s:T(4,14,10,44),e:T(4,16,13,14),t:'team',p:'浅井',tp:'浅井が異議申立て不可(LINE)'},
@@ -452,10 +452,10 @@ const D=[
 {s:T(4,23,11,41),e:T(4,23,11,53),t:'client',p:'根本',tp:'新山が高良議員メンション返信を提案→根本確認'},
 {s:T(4,23,11,53),e:T(4,23,13,10),t:'team',p:'新山',tp:'根本が返信文微修正(!を最後に)→新山がX返信'},
 ],en:T(4,23,13,10)},
-{n:'拓メシ RINK CAFE 104 弁当',p:'新山',dn:false,sg:[
+{n:'拓メシ RINK CAFE 104 弁当（打切）',p:'新山',dn:true,en:T(5,25,18),sg:[
 {s:T(4,23,19,35),e:T(4,24,18,13),t:'client',p:'根本',tp:'新山がRINK CAFE 104弁当で拓メシ提案+青木が補足情報→根本確認待ち'},
 {s:T(4,24,18,13),e:T(4,24,22,43),t:'client',p:'根本',tp:'新山が白河市産米に修正+投稿文改訂案を提出→根本確認待ち'},
-{s:T(4,24,22,43),e:T(6,1,14,5),t:'client',p:'根本',tp:'根本「画像そのまま、投稿文は提案通りで」承認→新山「明日の夜に投稿します」→根本確認待ち(完了報告未)'},
+{s:T(4,24,22,43),e:T(5,25,18),t:'client',p:'根本',tp:'根本「画像そのまま、投稿文は提案通りで」承認→新山「明日の夜に投稿します」→完了報告なし、5/25(日)時点で進展なく打切'},
 ]},
 {n:'拓メシ トクちゃんラーメン(郡山)',p:'中谷',dn:true,sg:[
 {s:T(4,26,17,29),e:T(4,27,0,56),t:'client',p:'根本',tp:'根本が案文+写真付きで新規投稿依頼(50周年手打ちワンタンメン)投稿タイミングいつでもOK'},
@@ -483,11 +483,11 @@ const D=[
 {n:'船引バイパス安全対策 動画',p:'新山',dn:true,sg:[
 {s:T(4,27,18,9),e:T(4,27,23,30),t:'team',p:'新山',tp:'新山がX/IG/FB/YouTube/TikTokに投稿完了(23:30完了報告)'},
 ],en:T(4,27,23,30)},
-{n:'拓メシ アスパラガス(松浦農園)',p:'新山',dn:false,sg:[
+{n:'拓メシ アスパラガス(松浦農園)（打切）',p:'新山',dn:true,en:T(5,25,18),sg:[
 {s:T(4,27,22,37),e:T(4,27,23,48),t:'client',p:'根本',tp:'根本が案文+写真付きで新規投稿依頼(郡山市田村町BBQでアスパラガス堪能)',raw:'```今日の拓メシ```\n@channel 新規投稿の作成をお願いします。\n===============\n松浦農園・松浦昇さんのアスパラガス\n・郡山市田村町でのバーベキューで松浦昇さんのこだわりのアスパラガスを堪能。\n・こんなに美味しいアスパラガスは初めてで、お肉そっちのけでアスパラガスを食べ続けました笑\n・愛情館、あぐりあ、ベレッシュなどで買えます！（売り切れ注意です！）'},
 {s:T(4,27,23,48),e:T(4,28,7,22),t:'team',p:'新山',tp:'新山が投稿案+画像4枚提出+3点相談(①松浦IGメンション②味わい表現③画像テキスト)',raw:'@根本拓\n\nお疲れ様です。\n投稿案を作成したのでご確認をよろしくお願いいたします。\n\nまた、ご相談したいことが3点ございます。\n①松浦昇さんのInstagramはメンションされますか。また、松浦昇さんが同BBQの画像を投稿していますが、リポストいたしますか（画像4枚目）。\n②キャプションの「こんなに美味しいアスパラガスは初めてで」について、\n→「こんなに甘くてみずみずしいアスパラガスは初めてで」\nのように、味わいがより伝わる表現にするのはいかがでしょうか。\n ③画像内テキストの文言について迷っております。ご意見やアドバイスがございましたらご教示いただけますと幸いです。\n\n=====\n郡山市田村町でのバーベキューで、松浦昇さんこだわりのアスパラガスを堪能しました！\n\nこんなに美味しいアスパラガスは初めてで、お肉そっちのけで食べ続けてしまいました笑\n\n愛情館・あぐりあ・ベレッシュなどで購入できます！（売り切れ注意です！）'},
 {s:T(4,28,7,22),e:T(4,28,13,14),t:'client',p:'根本',tp:'根本「①メンション+リポスト+フォローお願い②甘くてみずみずしい③シンプルに」承認',raw:'@新山琴子（にいやまことこ） 早速にありがとうございます！\n\n①はメンションと松浦さん投稿のリポストをお願いします！　また松浦さんアカウントのフォローもお願いします。\n②は「甘くてみずみずしい」でお願いします。\n③はシンプルなひとつめが良いかと思いました！'},
-{s:T(4,28,13,14),e:T(6,1,14,5),t:'client',p:'根本',tp:'新山がリポスト+フォロー完了→ストーリー当日夜展開予定→根本確認待ち(完了報告未)',raw:'@根本拓\nありがとうございます！\n①のリポストおよびフォロー完了いたしました。\nストーリーは本日の夜に展開いたします！'},
+{s:T(4,28,13,14),e:T(5,25,18),t:'client',p:'根本',tp:'新山がリポスト+フォロー完了→ストーリー当日夜展開予定→完了報告なし、5/25(日)時点で進展なく打切',raw:'@根本拓\nありがとうございます！\n①のリポストおよびフォロー完了いたしました。\nストーリーは本日の夜に展開いたします！'},
 ]},
 {n:'拓メシ 岩瀬のすし観・やすひら',p:'中谷',dn:true,en:T(5,17,15,0),sg:[
 {s:T(5,16,23,14),e:T(5,17,15,0),t:'team',p:'中谷',tp:'根本「今日の拓メシ:岩瀬のすし観・やすひら(須賀川市岩瀬・矢部親子経営、寿司屋+ラーメン屋、ランチセットあり)」新規投稿依頼→5/17 15:00中谷さんがIGストーリー投稿完了'},
@@ -655,7 +655,7 @@ const D=[
 {s:T(5,21,17,47),e:T(5,21,18,19),t:'team',p:'新山',tp:'根本「クイックにありがとうございます!文章は少し手直しした以下でお願いします。4枚目に当日の猪苗代湖で私が飛ばされそうになっている写真を追加していただけるでしょうか」(17:47) +改良文+追加写真依頼→新山対応待ち',raw:'@新山琴子 クイックにありがとうございます!文章は少し手直しした以下でお願いします。4枚目に、当日の猪苗代湖で私が飛ばされそうになっている写真を追加していただけるでしょうか。'},
 {s:T(5,21,18,19),e:T(5,21,23,27),t:'client',p:'根本',tp:'新山「文章ありがとうございます。猪苗代湖の画像は添付の1、2枚目でお間違い無いでしょうか。吹き飛ばされそうな感じが伝わるので私は1枚目の方が良いと思います」(18:19) +画像IMG_2900/2901→根本確認待ち',raw:'@根本拓 文章ありがとうございます。猪苗代湖の画像は添付の1、2枚目でお間違い無いでしょうか。吹き飛ばされそうな感じが伝わるので私は1枚目の方が良いと思います。'},
 {s:T(5,21,23,27),e:T(5,22,14,47),t:'team',p:'新山',tp:'根本「はい、こちらです。では1枚目でお願いします!」(23:27)→新山投稿実行待ち',raw:'@新山琴子 はい、こちらです。では1枚目でお願いします!'},
-{s:T(5,22,14,47),e:T(6,1,14,5),t:'team',p:'新山',tp:'新山「ありがとうございます!運動会の投稿が本日18時にアップロードされると思うので、こちらは明日(5/23)の18時に予約いたします」(14:47)→team予約コミット型(5/23 18時)→完了報告未着',raw:'@根本拓 ありがとうございます!運動会の投稿が本日の18時にアップロードされれると思うので、こちらは明日の18時に予約いたします。'},
+{s:T(5,22,14,47),e:T(6,2,16),t:'team',p:'新山',tp:'新山「ありがとうございます!運動会の投稿が本日18時にアップロードされると思うので、こちらは明日(5/23)の18時に予約いたします」(14:47)→team予約コミット型(5/23 18時)→完了報告未着',raw:'@根本拓 ありがとうございます!運動会の投稿が本日の18時にアップロードされれると思うので、こちらは明日の18時に予約いたします。'},
 ]},
 {n:'ファームパークいわえ 田んぼアート動画',p:'新山',dn:true,en:T(5,30,15,39),sg:[
 {s:T(5,27,21,17),e:T(5,27,21,47),t:'client',p:'根本',tp:'新山「ファームパークいわえの田んぼアートの動画が完成いたしました」(21:17 動画提出)→確認待ち',raw:'@根本拓 <!channel> お疲れ様です。ファームパークいわえの田んぼアートの動画が完成いたしましたので、お手隙の際にご確認よろしくお願いいたします。'},
@@ -682,7 +682,7 @@ const D=[
 {n:'AI画像生成の検討(三島始球式テスト)',p:'中谷',dn:false,sg:[
 {s:T(5,29,15,54),e:T(5,29,16,31),t:'client',p:'根本',tp:'中谷「写真がない場合AIで画像生成しIG投稿してもよいのではとLINEでご提案いただいた件。三島さんの始球式投稿についてAI画像生成を試みました、いかがでしょうか?」(5/29 15:54 AI画像デモ提出)→根本確認'},
 {s:T(5,29,16,31),e:T(5,29,17,30),t:'team',p:'中谷',tp:'根本「ありがとうございます!もうちょっとわざとらしくない感じが良い。以前お送りしたニュースリンクの写真をAIに参照してもらうと良いかも」(16:31)→中谷再生成へ'},
-{s:T(5,29,17,30),e:T(6,1,14,5),t:'client',p:'根本',tp:'中谷がニュース写真参照で再生成→根本「良い感じ!」→福島テレビニュース写真提示→根本「これなら著作権の問題なさそう」→中谷(5/30 21:12)「今後写真がない場合AI画像生成しIG投稿を検討(著作権/現実乖離の2点意識)。この三島始球式投稿は時間が経ったので投稿不要?それとも実験的に投稿してみますか?」→根本の運用方針判断待ち'},
+{s:T(5,29,17,30),e:T(6,2,16),t:'client',p:'根本',tp:'中谷がニュース写真参照で再生成→根本「良い感じ!」→福島テレビニュース写真提示→根本「これなら著作権の問題なさそう」→中谷(5/30 21:12)「今後写真がない場合AI画像生成しIG投稿を検討(著作権/現実乖離の2点意識)。この三島始球式投稿は時間が経ったので投稿不要?それとも実験的に投稿してみますか?」→根本の運用方針判断待ち'},
 ]},
 {n:'鏡石町長選 木賊正男町長当選 投稿',p:'三上',dn:true,en:T(5,19,20,46),sg:[
 {s:T(5,19,11,32),e:T(5,19,20,46),t:'team',p:'三上',tp:'根本「鏡石町長選新規投稿作成、今日明日中、無投票公算大→当選決定後投稿、5/19公示日。木賊正男2期目当選、町役場職員出身/町政精通/物腰柔らか、初当選から良くしてきた、上京前6時新幹線で出陣式参加11時郡山発上京、当選おめでとう!」(11:32 投稿作成依頼) +ツーショット写真事務所スタッフ探し中→三上作成着手→5/19 20:46投稿完了(X/IG/FB)'},
@@ -691,19 +691,19 @@ const D=[
 {n:'砂子田信号機設置 LINE用動画+文章',p:'中谷',dn:true,en:T(5,20,12,27),sg:[
 {s:T(5,18,22,15),e:T(5,20,12,27),t:'team',p:'中谷',tp:'中谷「LINEでご連絡の砂子田交差点信号機設置の報告動画を作成、文章もご確認お願いします」(22:15) +動画+文章案(船引バイパス砂子田交差点信号機設置決定/早急対応は行政だけでなく地元の声があったお陰/政治によって地域の安心安全を守れるよう尽力)→根本承認→5/20 12:27中谷LINE配信完了(完了報告CH 三上付きで報告)',raw:'お疲れ様です。LINEでご連絡いただいてた、砂子田交差点への信号機設置の報告動画を作成いたしました。文章も作成しましたのでご確認お願いします。'},
 ]},
-{n:'熱中症警戒 投稿打診',p:'三上',dn:false,sg:[
+{n:'熱中症警戒 投稿打診（見送り終了）',p:'三上',dn:true,en:T(5,20,18,14),sg:[
 {s:T(5,18,18,16),e:T(5,18,19,38),t:'client',p:'根本',tp:'三上「本日福島県内で熱中症6人搬送のニュース。明日もさらに最高気温高い予報。熱中症警戒を呼びかける投稿はいかがでしょうか」(18:16) +民友ニュースリンク→根本判断待ち',raw:'熱中症の警戒。本日福島県内で熱中症で6人搬送とのニュースがございました。明日もさらに最高気温が高い予報となっています。熱中症の警戒を呼びかける旨の投稿はいかがでしょうか?よろしくお願いします。'},
 {s:T(5,18,19,38),e:T(5,19,22,13),t:'team',p:'新山',tp:'根本「いいですね!お願いします!」(19:38)→新山が文章案作成へ',raw:'@三上雄大 いいですね! お願いします!'},
 {s:T(5,19,22,13),e:T(5,19,22,54),t:'client',p:'根本',tp:'新山が文章案提出「福島県内では今年初の真夏日となった17日に、熱中症の疑いで6人が搬送されたとのことです…」(22:13)→根本確認待ち',raw:'@根本拓 お疲れ様です。熱中症の呼びかけに関して、以下の文章でいかがでしょうか。'},
 {s:T(5,19,22,54),e:T(5,20,10,3),t:'team',p:'三上',tp:'根本「ただ、福島は明日は最高気温が30度を切り、曇り/雨なので、ちょっと今からの投稿だとタイミングが遅いかなと思いました…」(22:54)→team側で再検討',raw:'ありがとうございます。ただ、福島は明日は最高気温が30度を切り、曇り/雨なので、ちょっと今からの投稿だとタイミングが遅いかなと思いました。。。'},
 {s:T(5,20,10,3),e:T(5,20,10,43),t:'client',p:'根本',tp:'三上「申し訳ございません。今後、対策の呼びかけが必要な天候の変化があった場合、タイミングよく投稿作成に入れるよう、準備してまいります」(10:03)→根本反応待ち',raw:'@根本拓 根本さん、おはようございます。こちらから提案しておきながら、投稿文の作成が遅れ、申し訳ございません。今後、対策の呼びかけが必要な天候の変化があった場合、タイミングよく投稿作成に入れるよう、準備してまいります。'},
 {s:T(5,20,10,43),e:T(5,20,18,14),t:'team',p:'三上',tp:'根本「いえいえ、こういう投稿して多少伸びればラッキーくらいの投稿は無理なく行きましょう!」(10:43)→team側で気候監視継続',raw:'@三上雄大 いえいえ、こういう投稿して多少伸びればラッキーくらいの投稿は無理なく行きましょう!'},
-{s:T(5,20,18,14),e:T(6,1,14,5),t:'team',p:'三上',tp:'三上「ありがとうございます。引き続きよろしくお願いいたします」(18:14)→team側で次の暑い日を待機・監視継続',raw:'@根本拓 ありがとうございます。引き続きよろしくお願いいたします。'},
+{s:T(5,20,18,14),e:T(5,20,18,14),t:'team',p:'三上',tp:'三上「ありがとうございます。引き続きよろしくお願いいたします」(18:14)→次の暑い日を待機としたが、その後投稿には至らず(完了報告なし)。タイミングを逸し見送り終了',raw:'@根本拓 ありがとうございます。引き続きよろしくお願いいたします。'},
 ]},
 {n:'木の画像確認依頼',p:'新山',dn:false,sg:[
 {s:T(5,18,18,4),e:T(5,18,19,39),t:'client',p:'根本',tp:'新山「こちらの木を眺めている画像が何の画像か教えていただけますでしょうか。また2枚目の写真の木と同じものか確認お願いします。必要に応じて投稿文作成も可能」(18:04) +画像2枚(根本さんが木を眺める/別アングルの木)→根本回答待ち',raw:'お疲れ様です。こちらの木を眺めている画像が何の画像か教えていただけますでしょうか。また、2枚目の写真の木と同じものかもあわせて確認いただけますと幸いです。必要に応じて投稿文の作成も可能ですので、お申し付けください。よろしくお願いいたします。'},
 {s:T(5,18,19,39),e:T(5,19,12,44),t:'team',p:'新山',tp:'根本「松食い虫の被害現場視察ですが、いま動いているところなので、成果が出たタイミングで投稿をしたい」(19:39)→新山リアクション待ち',raw:'@新山琴子 ご提案をありがとうございます! こちらは松食い虫の被害現場視察なのですが、いま動いているところなので、成果が出たタイミングで投稿をしたいと思っています:slightly_smiling_face:'},
-{s:T(5,19,12,44),e:T(6,1,14,5),t:'client',p:'根本',tp:'新山「承知いたしました! ご連絡をお待ちしております」(5/19 12:44)→根本側で成果出るタイミング判断・連絡待ち',raw:'@根本拓 承知いたしました! ご連絡をお待ちしております。'},
+{s:T(5,19,12,44),e:T(6,2,16),t:'client',p:'根本',tp:'新山「承知いたしました! ご連絡をお待ちしております」(5/19 12:44)→根本側で成果出るタイミング判断・連絡待ち',raw:'@根本拓 承知いたしました! ご連絡をお待ちしております。'},
 ]},
 {n:'大勝会混成家庭バレーボール大会 動画投稿打診',p:'新山',dn:true,en:T(5,18,17,21),sg:[
 {s:T(5,14,12,26),e:T(5,14,14,33),t:'client',p:'根本',tp:'新山「5/10 LINEアルバムにある大勝会混成家庭バレーボール大会動画を投稿いかがですか?」+構成案(練習風景→軌道修正スパイク→本番ZERO戦華麗スパイク→緊張感間→惜しくもライン外→残念ですが楽しかった/またリベンジ)+類似事例(ホームランに挑戦リール)→根本判断待ち',raw:'お疲れ様です。\n5/10のLINEアルバムに上がっている「大勝会混成家庭バレーボール大会」の動画を投稿するのはいかがでしょうか。\n構成といたしましては、まず練習風景でネットに引っかかってしまい少し不安な様子→練習中に軌道修正してスパイクを決める様子→本番でZEROの皆さんとの試合中に華麗なスパイクを決めるシーン→少し緊張感のある間を入れ、最後は惜しくもラインの外へ→「残念ですが楽しかったです、また誘ってください!/またリベンジさせてください!」で締める、という流れを想定しております。'},
@@ -737,11 +737,16 @@ const D=[
 {s:T(5,12,18,33),e:T(5,12,18,36),t:'team',p:'新山',tp:'根本「はい、投稿をお願いします!」(18:33) bowリアクション→新山が投稿実行'},
 {s:T(5,12,18,36),e:T(5,12,18,36),t:'team',p:'新山',tp:'新山「砂子田交差点信号機設置の件、投稿が完了」(18:36 完了報告CH、prayリアクション)→X/IG/FB投稿完了 https://x.com/taku_nemoto_/status/2054133108619014503',raw:'<!channel>\n砂子田交差点信号機設置の件、投稿が完了いたしました。\n【X】【Instagram】【Facebook】'},
 ],en:T(5,12,18,36)},
+{n:'尚志高校サッカー部 インターハイ出場応援投稿打診',p:'新山',dn:false,sg:[
+{s:T(6,1,17,34),e:T(6,2,16),t:'client',p:'根本',tp:'新山「尚志高校がインターハイ出場決定の記事を引用して尚志高校サッカー部を応援する投稿はいかがでしょうか。過去投稿の写真使用でInstagramにも投稿可能」(6/1 17:34) +投稿案(学園顧問を務める尚志高校サッカー部がインターハイ福島県予選を勝ち抜き全国大会出場決定、選手・監督コーチ関係者おめでとう、全国でも尚志らしいサッカーで躍動を期待)+Yahoo記事リンク→根本確認待ち',raw:'<!channel> @根本拓\n\nお疲れ様です。\n尚志高校がインターハイに出場決定したという記事を引用して、尚志高校サッカー部を応援する投稿はいかがでしょうか。\n過去の投稿の写真を使用することでInstagramにも投稿可能だと思いますが、いかがでしょうか。\nご確認よろしくお願いいたします。\n\n＝＝＝＝＝＝＝＝＝＝＝＝＝\n尚志高校インターハイ出場決定！\n\n私が学園顧問を務める尚志高校サッカー部が、インターハイ福島県予選を勝ち抜き、全国大会出場を決めました！\n\n選手の皆さん、監督・コーチをはじめ関係者の皆さん、本当におめでとうございます。\n\n全国の舞台でも尚志高校らしいサッカーで躍動してくれることを期待しています。頑張ってください！'},
+]},
 ]},
 ];
 
 // === FLATTEN ===
 const ALL=[];
+// 各カテゴリ内のタスクを開始時刻(最初のセグメント)順に並べ替え
+D.forEach(cat=>cat.tasks.sort((a,b)=>Math.min(...a.sg.map(s=>s.s))-Math.min(...b.sg.map(s=>s.s))));
 D.forEach(cat=>cat.tasks.forEach(tk=>{
   const st=Math.min(...tk.sg.map(s=>s.s)), et=Math.max(...tk.sg.map(s=>s.e));
   ALL.push({...tk,cat:cat.cat,_st:st,_et:et});
