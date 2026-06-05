@@ -202,7 +202,7 @@ let curRange=7, curFilter='all', curSearch='', curChar=null, zoom=1;
 // === TIME ===
 const NOW_DATE=new Date();NOW_DATE.setHours(0,0,0,0);
 const W=['日','月','火','水','木','金','土'];
-const UPD='2026-06-05 10:48';
+const UPD='2026-06-05 11:06';
 
 function T(mo,dy,h=0,m=0){return new Date(2026,mo-1,dy,h,m).getTime();}
 function fmtDate(ts){const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()}(${W[d.getDay()]}) ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
